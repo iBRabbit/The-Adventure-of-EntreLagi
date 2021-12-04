@@ -2,11 +2,12 @@ import turtle
 import time
 import random
 
-DELAY = 0.001
+# ========= INIT VARIABLES ========= #
+DELAY = 0.001 # Delay Kedip Layar
 MAX_OBS = 10
 MAX_ENEMIES = 2
 
-window = turtle.Screen()
+window = turtle.Screen() # Screen
 window.title("Pac-Entre-Lagi")
 window.bgcolor("black")
 window.setup(width = 600, height = 600)
@@ -20,11 +21,12 @@ player.penup()
 player.goto(0,0)
 player.direction = "stop"
 
-obs = [] # Obstacles
-enemies = [] # Enemies
+obs = [] # Array of Obstacles
+enemies = [] # Array of Enemies
 
-# Functions #
+# ========= INIT VARIABLES ========= #
 
+# ========= FUNCTIONS ========= #
 def initObstacles():
     for i in range(MAX_OBS):
         posx = random.randint(-14, 14) * 20 
@@ -90,6 +92,8 @@ def obstaclesCheck(nextX, nextY):
         if nextX == obs[i].xcor() and nextY == obs[i].ycor() : return False
     
     return True
+
+# ========= FUNCTIONS ========= #
 
 def Main():
     initObstacles()
