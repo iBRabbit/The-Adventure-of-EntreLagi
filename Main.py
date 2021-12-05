@@ -1,6 +1,7 @@
 import turtle
 import time
 import random
+import math
 
 # ========= INIT VARIABLES ========= #
 DELAY = 0.001 # Delay Kedip Layar
@@ -14,12 +15,20 @@ window.setup(width = 600, height = 600)
 window.tracer(0)
 
 player = turtle.Turtle()
-player.speed(0)
+player.speed(3)
 player.shape("square")
 player.color("aqua")
 player.penup()
 player.goto(0,0)
 player.direction = "stop"
+
+goal = turtle.Turtle()
+goal.speed()
+goal.shape("square")
+goal.color("yellow")
+goal.penup()
+goal.goto(280, -180)
+
 
 obs = [] # Array of Obstacles
 enemies = [] # Array of Enemies
@@ -27,6 +36,10 @@ enemies = [] # Array of Enemies
 # ========= INIT VARIABLES ========= #
 
 # ========= FUNCTIONS ========= #
+ 
+def distance(x1,y1,x2,y2): # Akhirnya pelajaran kalkulus selama ini kepake
+    return math.sqrt((x2 - x1)**2 + (y2 - y1) ** 2)
+
 def initObstacles():
     for i in range(MAX_OBS):
         posx = random.randint(-14, 14) * 20 
@@ -46,9 +59,9 @@ def initEnemies():
         posy = random.randint(-14, 14) * 20
         
         en = turtle.Turtle()
-        en.speed(0)
-        en.goto(posx, posy)
-        en.penup
+        en.speed = 1
+        en.setposition(posx, posy)
+        en.penup()
         en.color("red")
         en.shape("circle")
         enemies.append(en)
@@ -93,6 +106,40 @@ def obstaclesCheck(nextX, nextY):
     
     return True
 
+def moveEnemy():
+    for en in enemies:
+        y = en.ycor()
+        x = en.xcor()
+        
+        distances = {
+            "Up" : distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()),
+            "Down" : distance(en.xcor(), en.ycor() - 20, player.xcor(), player.ycor()),
+            "Left" : distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor()),
+            "Right" : distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor())
+        }
+        
+        mininum = min(distances, key = distances.get)
+        
+        if mininum == "Up" and distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()) < en.distance(player) : y += en.speed
+        elif mininum == "Down" and distance(en.xcor(), en.ycor() - 20, player.xcor(), player.ycor()) < en.distance(player) : y += -en.speed
+        elif mininum == "Left" and distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player) : x += en.speed
+        elif mininum == "Right" and distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player): x += -en.speed
+        
+        # if(distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()) < en.distance(player)): # Go Up
+        #     y += en.speed
+        # elif(distance(en.xcor(), en.ycor() - 20, player.xcor(), player.ycor()) < en.distance(player)): # Go Down
+        #     y += -en.speed
+        # elif(distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player)): # Go Right
+        #     x += en.speed
+        # elif(distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player)): # Go Left
+        #     x += -en.speed
+        
+        if obstaclesCheck(x,y) == True :
+            en.sety(y)
+            en.setx(x)
+        
+        print(obstaclesCheck(x,y))
+    
 # ========= FUNCTIONS ========= #
 
 def Main():
@@ -106,8 +153,9 @@ def Main():
 
     while True:
         window.update()
+        moveEnemy()
         time.sleep(DELAY)
-        
+
     window.mainloop()
 
 Main()
