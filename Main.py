@@ -82,6 +82,11 @@ def initEnemies():
         elif direction == 4 : en.direction = "Right"
         enemies.append(en)
 
+def mapLimit(posx, posy):
+    if posx == 300 | posx == -300 | posy == 300 | posy == -300:
+        return True
+    return False
+    
 def getPlayerCurrentPos():
     curr_x = player.xcor()
     curr_y = player.ycor()
@@ -93,7 +98,7 @@ def moveUp():
     x = player.xcor()
     y = player.ycor()
     if obstaclesCheck(x, y + 20) == False : return False
-    # if y + 20 > 
+    if mapLimit(x, y+20) == True: return False
     player.sety(y + 20)
 
 def moveDown():
@@ -101,6 +106,7 @@ def moveDown():
     x = player.xcor()
     y = player.ycor()
     if obstaclesCheck(x, y - 20) == False : return False
+    if mapLimit(x, y-20) == True: return False
     player.sety(y - 20)
 
 def moveLeft():
@@ -108,6 +114,7 @@ def moveLeft():
     x = player.xcor()   
     y = player.ycor()
     if obstaclesCheck(x - 20, y) == False : return False
+    if mapLimit(x-20, y) == True: return False
     player.setx(x - 20)
 
 def moveRight():
@@ -115,6 +122,7 @@ def moveRight():
     x = player.xcor()
     y = player.ycor()
     if obstaclesCheck(x + 20, y) == False : return False
+    if mapLimit(x+20, y) == True: return False
     player.setx(x + 20)
 
 def obstaclesCheck(nextX, nextY):
