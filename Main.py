@@ -4,8 +4,8 @@ import random
 import math
 
 # ========= INIT VARIABLES ========= #
-DELAY = 0.001 # Delay Kedip Layar
-MAX_OBS = 10
+DELAY = 0.1 # Delay Kedip Layar
+MAX_OBS = 100
 MAX_ENEMIES = 5
 
 window = turtle.Screen() # Screen
@@ -19,7 +19,7 @@ player.speed(3)
 player.shape("square")
 player.color("aqua")
 player.penup()
-player.goto(0,0)
+player.goto(-280, 0)
 player.direction = "stop"
 
 goal = turtle.Turtle()
@@ -27,7 +27,7 @@ goal.speed()
 goal.shape("square")
 goal.color("yellow")
 goal.penup()
-goal.goto(280, -180)
+goal.goto(280, 0)
 
 
 obs = [] # Array of Obstacles
@@ -45,6 +45,10 @@ def initObstacles():
         posx = random.randint(-14, 14) * 20 
         posy = random.randint(-14, 14) * 20
         
+        while posx == -280 & posy == 0 | posx == 280 & posy == 0:
+            posx = random.randint(-14, 14) * 20 
+            posy = random.randint(-14, 14) * 20
+        
         ob = turtle.Turtle()
         ob.speed(0)
         ob.goto(posx, posy)
@@ -55,16 +59,27 @@ def initObstacles():
 
 def initEnemies():
     for i in range(MAX_ENEMIES):
-        posx = random.randint(-14, 14) * 20 
-        posy = random.randint(-14, 14) * 20
-        
+        check = False
+        while check == False:
+            posx = random.randint(-14, 14) * 20 
+            posy = random.randint(-14, 14) * 20
+            for j in range(MAX_OBS):
+                if posx != obs[j].xcor() & posy != obs[j].ycor():
+                    check = True
+                    break
+            if check == True: break
+
         en = turtle.Turtle()
-        en.speed = 1
+        en.speed = 5
         en.setposition(posx, posy)
         en.penup()
         en.color("red")
         en.shape("circle")
-        en.direction = "stop"
+        direction = random.randint(1,4)
+        if direction == 1 : en.direction = "Up"
+        elif direction == 2 : en.direction = "Down"
+        elif direction == 3 : en.direction = "Left"
+        elif direction == 4 : en.direction = "Right"
         enemies.append(en)
 
 def getPlayerCurrentPos():
@@ -77,34 +92,34 @@ def moveUp():
     getPlayerCurrentPos()
     x = player.xcor()
     y = player.ycor()
-    if obstaclesCheck(x, y + 20) == False : return False;
+    if obstaclesCheck(x, y + 20) == False : return False
+    # if y + 20 > 
     player.sety(y + 20)
 
 def moveDown():
     getPlayerCurrentPos()
     x = player.xcor()
     y = player.ycor()
-    if obstaclesCheck(x, y - 20) == False : return False;
+    if obstaclesCheck(x, y - 20) == False : return False
     player.sety(y - 20)
 
 def moveLeft():
     getPlayerCurrentPos()
     x = player.xcor()   
     y = player.ycor()
-    if obstaclesCheck(x - 20, y) == False : return False;
+    if obstaclesCheck(x - 20, y) == False : return False
     player.setx(x - 20)
 
 def moveRight():
     getPlayerCurrentPos()
     x = player.xcor()
     y = player.ycor()
-    if obstaclesCheck(x + 20, y) == False : return False;
+    if obstaclesCheck(x + 20, y) == False : return False
     player.setx(x + 20)
 
 def obstaclesCheck(nextX, nextY):
     for i in range(MAX_OBS):
-        if nextX == obs[i].xcor() and nextY == obs[i].ycor() : return False
-    
+        if abs(nextX - obs[i].xcor()) < 20  and abs(nextY - obs[i].ycor()) < 20 : return False
     return True
 
 def moveEnemy():
@@ -117,8 +132,17 @@ def moveEnemy():
                 y += en.speed
                 en.direction = "Up"
             elif en.direction == "Down" :
-                y += en.speed
+                y -= en.speed
                 en.direction = "Down"
+            elif en.direction == "Left" :
+                x += en.speed
+                en.direction = "Left"
+            elif en.direction == "Right" :
+                x -= en.speed
+                en.direction = "Right"
+            if obstaclesCheck(x, y) == False : continue
+            en.sety(y)
+            en.setx(x)
             continue
         
         distances = {
@@ -152,7 +176,9 @@ def moveEnemy():
         # elif(distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player)): # Go Left
         #     x += -en.speed
         
-        if obstaclesCheck(x,y) == True :
+        if obstaclesCheck(x,y) == False :
+            x
+        else :     
             en.sety(y)
             en.setx(x)
         
