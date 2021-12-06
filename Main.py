@@ -7,6 +7,9 @@ import math
 DELAY = 0.1 # Delay Kedip Layar
 MAX_OBS = 100
 MAX_ENEMIES = 5
+MAP_SIZE_X = 600
+MAP_SIZE_Y = 600
+CURRENT_LEVEL = 1
 
 window = turtle.Screen() # Screen
 window.title("Pac-Entre-Lagi")
@@ -31,12 +34,11 @@ goal.goto(280, 0)
 
 text = turtle.Turtle()
 text.speed(0)
-# text.shape("line")
 text.color("white")
 text.penup()
 text.hideturtle()
-# text.
-
+text.goto(0, 310)
+text.write("Level : 1", align = "center", font = ("Arial", 24, "normal"))
 
 obs = [] # Array of Obstacles
 enemies = [] # Array of Enemies
