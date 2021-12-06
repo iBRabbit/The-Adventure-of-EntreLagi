@@ -225,23 +225,12 @@ def moveEnemy():
         elif mininum == "Right" and distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player) : 
             x += -en.speed
             en.direction = "Right"
-        
-        # if(distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()) < en.distance(player)): # Go Up
-        #     y += en.speed
-        # elif(distance(en.xcor(), en.ycor() - 20, player.xcor(), player.ycor()) < en.distance(player)): # Go Down
-        #     y += -en.speed
-        # elif(distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player)): # Go Right
-        #     x += en.speed
-        # elif(distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player)): # Go Left
-        #     x += -en.speed
-        
+      
         if obstaclesCheck(x,y) == False :
             x
         else :     
             en.sety(y)
             en.setx(x)
-        
-        # print(obstaclesCheck(x,y))
     
 # ========= FUNCTIONS ========= #
 
