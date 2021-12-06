@@ -45,19 +45,46 @@ enemies = [] # Array of Enemies
 
 # ========= FUNCTIONS ========= #
  
-def createLine(initPosX, initPosY):
-    line = turtle.Turtle()
-    line.fillcolor("red")
-    line.goto(-300, 300)
-    line.begin_fill()
-    line.forward(600)
-    line.right(90)
-    line.forward(5)
-    line.right(90)
-    line.forward(600)
-    line.hideturtle()
-    line.end_fill()
+def createLine(line, x):
+    if x == 0:
+        line.begin_fill()
+        line.forward(600)
+        line.right(90)
+        line.forward(5)
+        line.right(90)
+        line.forward(600)
+        line.hideturtle()
+        line.end_fill()
+    if x == 1:
+        line.begin_fill()
+        line.forward(590)
+        line.right(90)
+        line.forward(5)
+        line.right(90)
+        line.forward(590)
+        line.hideturtle()
+        line.end_fill()
 
+def border():
+    line1 = turtle.Turtle()
+    line1.fillcolor("red")
+    line1.goto(-300, 300)
+    createLine(line1,0)
+    line2 = turtle.Turtle()
+    line2.fillcolor("red")
+    line2.goto(300, -300)
+    line2.right(180)
+    createLine(line2,0)
+    line3 = turtle.Turtle()
+    line3.fillcolor("red")
+    line3.goto(300, 295)
+    line3.right(90)
+    createLine(line3,1)
+    line4 = turtle.Turtle()
+    line4.fillcolor("red")
+    line4.goto(-300, -295)
+    line4.left(90)
+    createLine(line4,1)
 
 def distance(x1,y1,x2,y2): # Akhirnya pelajaran kalkulus selama ini kepake
     return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
@@ -217,6 +244,7 @@ def moveEnemy():
 # ========= FUNCTIONS ========= #
 
 def Main():
+    border()
     initObstacles()
     initEnemies()
     window.listen()
