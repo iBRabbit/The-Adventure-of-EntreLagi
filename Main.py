@@ -11,7 +11,7 @@ MAX_ENEMIES = 5
 window = turtle.Screen() # Screen
 window.title("Pac-Entre-Lagi")
 window.bgcolor("black")
-window.setup(width = 600, height = 600)
+window.setup(width = 800, height = 800)
 window.tracer(0)
 
 player = turtle.Turtle()
@@ -29,6 +29,14 @@ goal.color("yellow")
 goal.penup()
 goal.goto(280, 0)
 
+text = turtle.Turtle()
+text.speed(0)
+# text.shape("line")
+text.color("white")
+text.penup()
+text.hideturtle()
+# text.
+
 
 obs = [] # Array of Obstacles
 enemies = [] # Array of Enemies
@@ -37,6 +45,20 @@ enemies = [] # Array of Enemies
 
 # ========= FUNCTIONS ========= #
  
+def createLine(initPosX, initPosY):
+    line = turtle.Turtle()
+    line.fillcolor("red")
+    line.goto(-300, 300)
+    line.begin_fill()
+    line.forward(600)
+    line.right(90)
+    line.forward(5)
+    line.right(90)
+    line.forward(600)
+    line.hideturtle()
+    line.end_fill()
+
+
 def distance(x1,y1,x2,y2): # Akhirnya pelajaran kalkulus selama ini kepake
     return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
