@@ -45,7 +45,7 @@ def initObstacles():
         posx = random.randint(-14, 14) * 20 
         posy = random.randint(-14, 14) * 20
         
-        while posx == -280 & posy == 0 | posx == 280 & posy == 0:
+        while posx == -280 and posy == 0 or posx == 280 and posy == 0:
             posx = random.randint(-14, 14) * 20 
             posy = random.randint(-14, 14) * 20
         
@@ -64,7 +64,7 @@ def initEnemies():
             posx = random.randint(-14, 14) * 20 
             posy = random.randint(-14, 14) * 20
             for j in range(MAX_OBS):
-                if posx != obs[j].xcor() & posy != obs[j].ycor():
+                if posx != obs[j].xcor() and posy != obs[j].ycor():
                     check = True
                     break
             if check == True: break
@@ -83,7 +83,7 @@ def initEnemies():
         enemies.append(en)
 
 def mapLimit(posx, posy):
-    if posx == 300 | posx == -300 | posy == 300 | posy == -300:
+    if posx == 300 or posx == -300 or posy == 300 or posy == -300:
         return True
     return False
     
