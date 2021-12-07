@@ -4,7 +4,7 @@ import random
 import math
 
 # ========= INIT VARIABLES ========= #
-DELAY = 0.0001 # Delay Kedip Layar
+DELAY = 0.1 # Delay Kedip Layar
 MAX_OBS = 50
 MAX_ENEMIES = 5
 MAP_SIZE_X = 600
