@@ -5,11 +5,12 @@ import math
 
 # ========= INIT VARIABLES ========= #
 DELAY = 0.1 # Delay Kedip Layar
-MAX_OBS = 50
-MAX_ENEMIES = 5
 MAP_SIZE_X = 600
 MAP_SIZE_Y = 600
-CURRENT_LEVEL = 1
+
+level = 1
+obsQty = 50
+enemiesQty = 5
 
 window = turtle.Screen() # Screen
 window.title("Pac-Entre-Lagi")
@@ -92,13 +93,14 @@ def distance(x1,y1,x2,y2): # Akhirnya pelajaran kalkulus selama ini kepake
     return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
 def initObstacles():
-    for i in range(MAX_OBS):
+    for i in range(obsQty):
         posx = random.randint(-14, 14) * 20 
         posy = random.randint(-14, 14) * 20
         
         while posx == -280 and posy == 0 or posx == 280 and posy == 0:
             posx = random.randint(-14, 14) * 20 
             posy = random.randint(-14, 14) * 20
+        
         
         ob = turtle.Turtle()
         ob.speed(0)
@@ -109,12 +111,12 @@ def initObstacles():
         obs.append(ob)
 
 def initEnemies():
-    for i in range(MAX_ENEMIES):
+    for i in range(enemiesQty):
         check = False
         while check == False:
             posx = random.randint(-14, 14) * 20 
             posy = random.randint(-14, 14) * 20
-            for j in range(MAX_OBS):
+            for j in range(obsQty):
                 if abs(posx - obs[j].xcor()) >= 20 and abs(posy - obs[j].ycor()) >= 20:
                     check = True
                     break
@@ -174,7 +176,11 @@ def isInRangeOfPoint(a,b,x,y,radius):
     return False
 
 def obstaclesCheck(nextX, nextY):
-    for i in range(MAX_OBS):
+    '''
+    Kalo True -> Ga Ada Obstacle
+    Kalo False -> Ada obstacle
+    '''
+    for i in range(obsQty):
         if isInRangeOfPoint(obs[i].xcor(), obs[i].ycor(), nextX, nextY, 10) == True: return False
     return True
 
@@ -260,7 +266,6 @@ def moveEnemy():
         }
 
         minimum = min(distances, key = distances.get)
-
         minimum = checkEnemyMove(minimum, x, y)
         
         if minimum == "Up" and distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()) < en.distance(player) : 
@@ -279,23 +284,76 @@ def moveEnemy():
         en.sety(y)
         en.setx(x)
     
+def clearAll():
+    for i in range(obsQty):
+        obs[i].reset()
+    
+    for i in range(enemiesQty):
+        enemies[i].reset()
+        
+    
+def setPlayerToSpawn():
+    player.setx(-280)
+    player.sety(0)
+    player.direction = "stop"
+
+def isGoalAchieved():
+    if player.distance(goal) < 20.0 : return True
+    else : return False
+        
+def setLevel(toLevel):
+    global level
+    level = toLevel
+        
+def goToNextLevel():
+    clearAll()
+    setPlayerToSpawn()
+    initObstacles()
+    initEnemies()
+    
+    currLevel = level
+    setLevel(currLevel + 1)
+    
+    currObs = obsQty
+    currEnemies = enemiesQty
+    
+    if level % 2 == 0 : 
+        currObs += 10
+        setObstacles(currObs)
+    
+    if level % 2 == 1 :
+        currEnemies += 1
+        setEnemiesQty(currEnemies)
+       
+def setObstacles(obs):
+    global obsQty
+    obsQty = obs
+
+def setEnemiesQty(enemies):
+    global enemiesQty
+    enemiesQty = enemies
+        
 # ========= FUNCTIONS ========= #
+
 
 def Main():
     border()
     initObstacles()
     initEnemies()
+
     window.listen()
     window.onkey(moveUp, "w")
     window.onkey(moveDown, "s")
     window.onkey(moveLeft, "a")
     window.onkey(moveRight, "d")
-
+    # x = 5
     while True:
         window.update()
         moveEnemy()
-        time.sleep(DELAY)
+        if isGoalAchieved() == True : goToNextLevel()
+        time.sleep(0.1)
 
     window.mainloop()
 
-Main()
+if __name__ == "__main__":
+    Main()
