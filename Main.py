@@ -55,7 +55,6 @@ scoreText.hideturtle()
 scoreText.goto(220,310)
 scoreText.write("Score : 0", align = "center", font = ("Arial", 24, "normal"))
 
-
 gameOverText = turtle.Turtle()
 gameOverText.speed(0)
 gameOverText.color("white")
@@ -209,7 +208,7 @@ def initFoods():
         foods.append(food)
    
 
-def mapLimit(posx, posy):
+def outOfMapLimit(posx, posy):
     if posx == 300 or posx == -300 or posy == 300 or posy == -300:
         return True
     return False
@@ -217,31 +216,31 @@ def mapLimit(posx, posy):
 def getPlayerCurrentPos():
     curr_x = player.xcor()
     curr_y = player.ycor()
-    print("[DEBUG] : Player Current Pos -> ", player.pos())
+    # print("[DEBUG] : Player Current Pos -> ", player.pos())
     return curr_x, curr_y
 
 def moveUp():
     x,y = getPlayerCurrentPos()
     if obstaclesCheck(x, y + 20) : return False
-    if mapLimit(x, y+20): return False
+    if outOfMapLimit(x, y+20): return False
     player.sety(y + 20)
 
 def moveDown():
     x,y = getPlayerCurrentPos()
     if obstaclesCheck(x, y - 20) : return False
-    if mapLimit(x, y-20): return False
+    if outOfMapLimit(x, y-20): return False
     player.sety(y - 20)
 
 def moveLeft():
     x,y = getPlayerCurrentPos()
     if obstaclesCheck(x - 20, y) : return False
-    if mapLimit(x-20, y): return False
+    if outOfMapLimit(x-20, y): return False
     player.setx(x - 20)
 
 def moveRight():
     x,y = getPlayerCurrentPos()
     if obstaclesCheck(x + 20, y) : return False
-    if mapLimit(x+20, y): return False
+    if outOfMapLimit(x+20, y): return False
     player.setx(x + 20)
 
 def isInRangeOfPoint(a,b,x,y,radius):
