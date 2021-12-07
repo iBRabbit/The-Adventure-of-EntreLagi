@@ -101,11 +101,10 @@ def initObstacles():
             posx = random.randint(-14, 14) * 20 
             posy = random.randint(-14, 14) * 20
         
-        
         ob = turtle.Turtle()
-        ob.speed(0)
+        ob.speed = 0
         ob.goto(posx, posy)
-        ob.penup
+        ob.penup()
         ob.color("green")
         ob.shape("triangle")
         obs.append(ob)
@@ -290,8 +289,13 @@ def clearAll():
     
     for i in range(enemiesQty):
         enemies[i].reset()
+
+    obs.clear()
+    enemies.clear()     
+    print(obs)
+    print(enemies)
+
         
-    
 def setPlayerToSpawn():
     player.setx(-280)
     player.sety(0)
@@ -308,21 +312,25 @@ def setLevel(toLevel):
 def goToNextLevel():
     clearAll()
     setPlayerToSpawn()
-    initObstacles()
-    initEnemies()
-    
+
     currLevel = level
     setLevel(currLevel + 1)
+    updateText()
     
     currObs = obsQty
     currEnemies = enemiesQty
     
     currObs += 2
     setObstacles(currObs)
-    
+
+    initObstacles()
+
     if level % 4 == 0 :
         currEnemies += 1
         setEnemiesQty(currEnemies)
+
+
+    initEnemies()
        
 def setObstacles(obs):
     global obsQty
@@ -331,7 +339,12 @@ def setObstacles(obs):
 def setEnemiesQty(enemies):
     global enemiesQty
     enemiesQty = enemies
-        
+
+def updateText():
+    text.clear()
+    string = "Level : " + str(level) 
+    text.write(string, align = "center", font = ("Arial", 24, "normal"))
+
 # ========= FUNCTIONS ========= #
 
 
