@@ -1,1 +1,2 @@
-circle = (x - a) ** 2 + (y - b) ** 2
+    # print(obs)
+    # print(enemies)

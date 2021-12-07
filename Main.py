@@ -14,7 +14,7 @@ enemiesQty = 5
 
 window = turtle.Screen() # Screen
 window.title("Pac-Entre-Lagi")
-window.bgcolor("white")
+window.bgcolor("black")
 window.setup(width = 800, height = 800)
 window.tracer(0)
 
@@ -292,11 +292,11 @@ def moveEnemy():
         en.setx(x)
     
 def clearAll():
-    for i in range(obsQty):
-        obs[i].reset()
+    for ob in obs:
+        ob.goto(9999999,9999999)
     
-    for i in range(enemiesQty):
-        enemies[i].reset()
+    for en in enemies:
+        en.goto(9999999,9999999)
 
     obs.clear()
     enemies.clear()     
