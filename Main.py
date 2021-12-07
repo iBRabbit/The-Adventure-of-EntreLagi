@@ -317,11 +317,10 @@ def goToNextLevel():
     currObs = obsQty
     currEnemies = enemiesQty
     
-    if level % 2 == 0 : 
-        currObs += 10
-        setObstacles(currObs)
+    currObs += 2
+    setObstacles(currObs)
     
-    if level % 2 == 1 :
+    if level % 4 == 0 :
         currEnemies += 1
         setEnemiesQty(currEnemies)
        
