@@ -41,6 +41,14 @@ text.hideturtle()
 text.goto(0, 310)
 text.write("Level : 1", align = "center", font = ("Arial", 24, "normal"))
 
+score = turtle.Turtle()
+score.speed(0)
+score.color("white")
+score.penup()
+score.hideturtle()
+score.goto(250,310)
+score.write("Score : 0", align = "center", font = ("Arial", 12, "normal"))
+
 obs = [] # Array of Obstacles
 enemies = [] # Array of Enemies
 
