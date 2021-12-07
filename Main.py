@@ -14,7 +14,7 @@ enemiesQty = 5
 
 window = turtle.Screen() # Screen
 window.title("Pac-Entre-Lagi")
-window.bgcolor("black")
+window.bgcolor("white")
 window.setup(width = 800, height = 800)
 window.tracer(0)
 
@@ -71,21 +71,29 @@ def createLine(line, x):
 def border():
     line1 = turtle.Turtle()
     line1.fillcolor("red")
+    line1.penup()
     line1.goto(-300, 300)
+    line1.pendown()
     createLine(line1,0)
     line2 = turtle.Turtle()
     line2.fillcolor("red")
+    line2.penup()
     line2.goto(300, -300)
+    line2.pendown()
     line2.right(180)
     createLine(line2,0)
     line3 = turtle.Turtle()
     line3.fillcolor("red")
+    line3.penup()
     line3.goto(300, 295)
+    line3.pendown()
     line3.right(90)
     createLine(line3,1)
     line4 = turtle.Turtle()
     line4.fillcolor("red")
+    line4.penup()
     line4.goto(-300, -295)
+    line4.pendown
     line4.left(90)
     createLine(line4,1)
 
@@ -103,8 +111,8 @@ def initObstacles():
         
         ob = turtle.Turtle()
         ob.speed = 0
-        ob.goto(posx, posy)
         ob.penup()
+        ob.goto(posx, posy)
         ob.color("green")
         ob.shape("triangle")
         obs.append(ob)
@@ -123,8 +131,8 @@ def initEnemies():
 
         en = turtle.Turtle()
         en.speed = 5
-        en.setposition(posx, posy)
         en.penup()
+        en.setposition(posx, posy)
         en.color("red")
         en.shape("circle")
         direction = random.randint(1,4)
