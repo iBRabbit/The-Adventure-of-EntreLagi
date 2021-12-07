@@ -4,7 +4,7 @@ import random
 import math
 
 # ========= INIT VARIABLES ========= #
-DELAY = 0.1 # Delay Kedip Layar
+DELAY = 0.0001 # Delay Kedip Layar
 MAX_OBS = 50
 MAX_ENEMIES = 5
 MAP_SIZE_X = 600
@@ -169,13 +169,13 @@ def moveRight():
     player.setx(x + 20)
 
 def isInRangeOfPoint(a,b,x,y,radius):
-    circle = (x - a) ** 2 + (y - b) ** 2
-    if circle <= radius ** 2 : return True 
-    elif circle > radius ** 2: return False
+    if a >= x-radius and a <= x+radius and b >= y-radius and b <= y+radius:
+        return True 
+    return False
 
 def obstaclesCheck(nextX, nextY):
     for i in range(MAX_OBS):
-        if isInRangeOfPoint(obs[i].xcor(), obs[i].ycor(), nextX, nextY, 19) == True: return False
+        if isInRangeOfPoint(obs[i].xcor(), obs[i].ycor(), nextX, nextY, 10) == True: return False
     return True
 
 def checkEnemyMove(direction, posx, posy):
