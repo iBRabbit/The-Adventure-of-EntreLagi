@@ -10,6 +10,7 @@ MAP_SIZE_Y = 600
 DEFAULT_MAX_OBS = 50
 DEFAULT_MAX_ENEMIES = 5
 DEFAULT_MAX_FOODS = 3
+INVALID_CONSTANT = -99999
 
 level = 1
 score = 0
@@ -356,13 +357,13 @@ def moveEnemy():
     
 def clearAll():
     for ob in obs:
-        ob.goto(9999999,9999999)
+        ob.goto(INVALID_CONSTANT,INVALID_CONSTANT)
     
     for en in enemies:
-        en.goto(9999999,9999999)
+        en.goto(INVALID_CONSTANT,INVALID_CONSTANT)
         
     for food in foods:
-        food.goto(9999999,9999999)
+        food.goto(INVALID_CONSTANT,INVALID_CONSTANT)
     
     foods.clear()
     obs.clear()
@@ -414,7 +415,7 @@ def isCollideWithEnemy():
 def isCollideWithFood():
     for i in range(foodsQty):
         if isInRangeOfPoint(foods[i].xcor(), foods[i].ycor(), player.xcor(), player.ycor(), 20.0) : 
-            foods[i].goto(-5000,5000)
+            foods[i].goto(INVALID_CONSTANT,INVALID_CONSTANT)
             foods.pop(i)
             setFoodQty(foodsQty - 1)
             return True
