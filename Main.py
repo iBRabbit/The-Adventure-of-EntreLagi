@@ -5,7 +5,7 @@ import math
 
 # ========= INIT VARIABLES ========= #
 DELAY = 0.1 # Delay Kedip Layar
-MAX_OBS = 100
+MAX_OBS = 50
 MAX_ENEMIES = 5
 MAP_SIZE_X = 600
 MAP_SIZE_Y = 600
@@ -115,7 +115,7 @@ def initEnemies():
             posx = random.randint(-14, 14) * 20 
             posy = random.randint(-14, 14) * 20
             for j in range(MAX_OBS):
-                if posx != obs[j].xcor() and posy != obs[j].ycor():
+                if abs(posx - obs[j].xcor()) >= 20 and abs(posy - obs[j].ycor()) >= 20:
                     check = True
                     break
             if check == True: break
@@ -145,33 +145,25 @@ def getPlayerCurrentPos():
     return curr_x, curr_y
 
 def moveUp():
-    getPlayerCurrentPos()
-    x = player.xcor()
-    y = player.ycor()
+    x,y = getPlayerCurrentPos()
     if obstaclesCheck(x, y + 20) == False : return False
     if mapLimit(x, y+20) == True: return False
     player.sety(y + 20)
 
 def moveDown():
-    getPlayerCurrentPos()
-    x = player.xcor()
-    y = player.ycor()
+    x,y = getPlayerCurrentPos()
     if obstaclesCheck(x, y - 20) == False : return False
     if mapLimit(x, y-20) == True: return False
     player.sety(y - 20)
 
 def moveLeft():
-    getPlayerCurrentPos()
-    x = player.xcor()   
-    y = player.ycor()
+    x,y = getPlayerCurrentPos()
     if obstaclesCheck(x - 20, y) == False : return False
     if mapLimit(x-20, y) == True: return False
     player.setx(x - 20)
 
 def moveRight():
-    getPlayerCurrentPos()
-    x = player.xcor()
-    y = player.ycor()
+    x,y = getPlayerCurrentPos()
     if obstaclesCheck(x + 20, y) == False : return False
     if mapLimit(x+20, y) == True: return False
     player.setx(x + 20)
@@ -181,6 +173,32 @@ def obstaclesCheck(nextX, nextY):
         if abs(nextX - obs[i].xcor()) < 20  and abs(nextY - obs[i].ycor()) < 20 : return False
     return True
 
+def checkEnemyMove(direction, posx, posy):
+    if direction == "Up" or direction == "Down":
+        if direction == "Up" and obstaclesCheck(posx, posy+20) == True :
+            return direction
+        elif direction == "Down" and obstaclesCheck(posx, posy-20) == True:
+            return direction
+        elif  obstaclesCheck(posx+20, posy) == False and obstaclesCheck(posx-20, posy) == False:
+            if direction == "Up": return "Down"
+            else: return direction
+        else: 
+            if distance(player.xcor(), player.ycor(), posx+20, posy) < distance(player.xcor(), player.ycor(), posx-20, posy): 
+                return "Right"
+            else: return "Left"
+    elif direction == "Left" or direction == "Right":
+        if direction == "Left" and obstaclesCheck(posx-20, posy) == True:
+            return direction
+        elif direction == "Right" and obstaclesCheck(posx+20, posy) == True:
+            return direction
+        elif  obstaclesCheck(posx, posy+20) == False and obstaclesCheck(posx, posy-20) == False:
+            if direction == "Left": return "Right"
+            else: return direction
+        else: 
+            if distance(player.xcor(), player.ycor(), posx, posy+20) < distance(player.xcor(), player.ycor(), posx, posy-20): 
+                return "Up"
+            else: return "Down"
+
 def moveEnemy():
     for en in enemies:
         y = en.ycor()
@@ -188,18 +206,49 @@ def moveEnemy():
         
         if distance(player.xcor(), player.ycor(), en.xcor(), en.ycor()) > 200:
             if en.direction == "Up" :
-                y += en.speed
-                en.direction = "Up"
+                if obstaclesCheck(x, y+20) == False:
+                    y -= en.speed
+                    en.direction = "Down"
+                else: 
+                    if y > 280: 
+                        en.direction = "Down"
+                        y -= en.speed
+                    else: 
+                        en.direction = "Up"
+                        y += en.speed
             elif en.direction == "Down" :
-                y -= en.speed
-                en.direction = "Down"
+                if obstaclesCheck(x, y-20) == False:
+                    y += en.speed
+                    en.direction = "Up"
+                else:
+                    if y < -280: 
+                        en.direction = "Up"
+                        y += en.speed
+                    else: 
+                        en.direction = "Down"
+                        y -= en.speed
             elif en.direction == "Left" :
-                x += en.speed
-                en.direction = "Left"
+                if obstaclesCheck(x-20, y) == False:
+                    x += en.speed
+                    en.direction = "Right"
+                else:
+                    if x < -280: 
+                        en.direction = "Right"
+                        x += en.speed
+                    else: 
+                        en.direction = "Left"
+                        x -= en.speed
             elif en.direction == "Right" :
-                x -= en.speed
-                en.direction = "Right"
-            if obstaclesCheck(x, y) == False : continue
+                if obstaclesCheck(x+20, y) == False:
+                    x -= en.speed
+                    en.direction = "Left"
+                else:
+                    if x > 280: 
+                        en.direction = "Left"
+                        x -= en.speed
+                    else: 
+                        en.direction = "Right"
+                        x += en.speed
             en.sety(y)
             en.setx(x)
             continue
@@ -210,27 +259,26 @@ def moveEnemy():
             "Left" : distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor()),
             "Right" : distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor())
         }
+
+        minimum = min(distances, key = distances.get)
+
+        minimum = checkEnemyMove(minimum, x, y)
         
-        mininum = min(distances, key = distances.get)
-        
-        if mininum == "Up" and distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()) < en.distance(player) : 
+        if minimum == "Up" and distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()) < en.distance(player) : 
             y += en.speed
             en.direction = "Up"
-        elif mininum == "Down" and distance(en.xcor(), en.ycor() - 20, player.xcor(), player.ycor()) < en.distance(player) : 
+        elif minimum == "Down" and distance(en.xcor(), en.ycor() - 20, player.xcor(), player.ycor()) < en.distance(player) : 
             y += -en.speed
             en.direction = "Down"
-        elif mininum == "Left" and distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player) : 
+        elif minimum == "Left" and distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player) : 
             x += en.speed
             en.direction = "Left"
-        elif mininum == "Right" and distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player) : 
+        elif minimum == "Right" and distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player) : 
             x += -en.speed
             en.direction = "Right"
-      
-        if obstaclesCheck(x,y) == False :
-            x
-        else :     
-            en.sety(y)
-            en.setx(x)
+          
+        en.sety(y)
+        en.setx(x)
     
 # ========= FUNCTIONS ========= #
 
