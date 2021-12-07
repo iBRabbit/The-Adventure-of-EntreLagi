@@ -4,13 +4,19 @@ import random
 import math
 
 # ========= INIT VARIABLES ========= #
-DELAY = 0.1 # Delay Kedip Layar
+DELAY = 0.001 # Delay Kedip Layar
 MAP_SIZE_X = 600
 MAP_SIZE_Y = 600
+DEFAULT_MAX_OBS = 50
+DEFAULT_MAX_ENEMIES = 5
+DEFAULT_MAX_FOODS = 3
 
 level = 1
-obsQty = 50
-enemiesQty = 5
+score = 0
+obsQty = DEFAULT_MAX_OBS
+enemiesQty = DEFAULT_MAX_ENEMIES
+foodsQty = DEFAULT_MAX_FOODS
+foodsMaxQty = DEFAULT_MAX_FOODS
 
 window = turtle.Screen() # Screen
 window.title("Pac-Entre-Lagi")
@@ -33,26 +39,61 @@ goal.color("yellow")
 goal.penup()
 goal.goto(280, 0)
 
-text = turtle.Turtle()
-text.speed(0)
-text.color("white")
-text.penup()
-text.hideturtle()
-text.goto(0, 310)
-text.write("Level : 1", align = "center", font = ("Arial", 24, "normal"))
+levelText = turtle.Turtle()
+levelText.speed(0)
+levelText.color("white")
+levelText.penup()
+levelText.hideturtle()
+levelText.goto(-220, 310)
+levelText.write("Level : 1", align = "center", font = ("Arial", 24, "normal"))
 
-score = turtle.Turtle()
-score.speed(0)
-score.color("white")
-score.penup()
-score.hideturtle()
-score.goto(250,310)
-score.write("Score : 0", align = "center", font = ("Arial", 12, "normal"))
+scoreText = turtle.Turtle()
+scoreText.speed(0)
+scoreText.color("white")
+scoreText.penup()
+scoreText.hideturtle()
+scoreText.goto(220,310)
+scoreText.write("Score : 0", align = "center", font = ("Arial", 24, "normal"))
+
+
+gameOverText = turtle.Turtle()
+gameOverText.speed(0)
+gameOverText.color("white")
+gameOverText.penup()
+gameOverText.hideturtle()
+gameOverText.goto(0,310)
 
 obs = [] # Array of Obstacles
 enemies = [] # Array of Enemies
+foods = []
 
 # ========= INIT VARIABLES ========= #
+
+# ========= SETTER ======== #
+def setObstaclesQty(obs):
+    global obsQty
+    obsQty = obs
+
+def setEnemiesQty(enemies):
+    global enemiesQty
+    enemiesQty = enemies
+
+def setLevel(toLevel):
+    global level
+    level = toLevel
+
+def setScore(toScore):
+    global score
+    score = toScore
+    
+def setFoodQty(foods):
+    global foodsQty
+    foodsQty = foods
+    
+def setFoodMaxQty(foods):
+    global foodsMaxQty
+    foodsMaxQty = foods
+# ========= SETTER ======== #        
 
 # ========= FUNCTIONS ========= #
  
@@ -128,17 +169,17 @@ def initObstacles():
 def initEnemies():
     for i in range(enemiesQty):
         check = False
-        while check == False:
+        while not check:
             posx = random.randint(-14, 14) * 20 
             posy = random.randint(-14, 14) * 20
             for j in range(obsQty):
                 if abs(posx - obs[j].xcor()) >= 20 and abs(posy - obs[j].ycor()) >= 20:
                     check = True
                     break
-            if check == True: break
+            if check: break
 
         en = turtle.Turtle()
-        en.speed = 5
+        en.speed = 1
         en.penup()
         en.setposition(posx, posy)
         en.color("red")
@@ -149,6 +190,24 @@ def initEnemies():
         elif direction == 3 : en.direction = "Left"
         elif direction == 4 : en.direction = "Right"
         enemies.append(en)
+
+def initFoods():
+    for i in range(foodsQty):
+        posx = random.randint(-14, 14) * 20 
+        posy = random.randint(-14, 14) * 20
+        
+        while posx == -280 and posy == 0 or posx == 280 and posy == 0:
+            posx = random.randint(-14, 14) * 20 
+            posy = random.randint(-14, 14) * 20
+        
+        food = turtle.Turtle()
+        food.speed = 0
+        food.penup()
+        food.goto(posx, posy)
+        food.color("pink")
+        food.shape("turtle")
+        foods.append(food)
+   
 
 def mapLimit(posx, posy):
     if posx == 300 or posx == -300 or posy == 300 or posy == -300:
@@ -163,26 +222,26 @@ def getPlayerCurrentPos():
 
 def moveUp():
     x,y = getPlayerCurrentPos()
-    if obstaclesCheck(x, y + 20) == False : return False
-    if mapLimit(x, y+20) == True: return False
+    if obstaclesCheck(x, y + 20) : return False
+    if mapLimit(x, y+20): return False
     player.sety(y + 20)
 
 def moveDown():
     x,y = getPlayerCurrentPos()
-    if obstaclesCheck(x, y - 20) == False : return False
-    if mapLimit(x, y-20) == True: return False
+    if obstaclesCheck(x, y - 20) : return False
+    if mapLimit(x, y-20): return False
     player.sety(y - 20)
 
 def moveLeft():
     x,y = getPlayerCurrentPos()
-    if obstaclesCheck(x - 20, y) == False : return False
-    if mapLimit(x-20, y) == True: return False
+    if obstaclesCheck(x - 20, y) : return False
+    if mapLimit(x-20, y): return False
     player.setx(x - 20)
 
 def moveRight():
     x,y = getPlayerCurrentPos()
-    if obstaclesCheck(x + 20, y) == False : return False
-    if mapLimit(x+20, y) == True: return False
+    if obstaclesCheck(x + 20, y) : return False
+    if mapLimit(x+20, y): return False
     player.setx(x + 20)
 
 def isInRangeOfPoint(a,b,x,y,radius):
@@ -191,30 +250,27 @@ def isInRangeOfPoint(a,b,x,y,radius):
     return False
 
 def obstaclesCheck(nextX, nextY):
-    '''
-    Kalo True -> Ga Ada Obstacle
-    Kalo False -> Ada obstacle
-    '''
     for i in range(obsQty):
-        if isInRangeOfPoint(obs[i].xcor(), obs[i].ycor(), nextX, nextY, 10) == True: return False
-    return True
+        if isInRangeOfPoint(obs[i].xcor(), obs[i].ycor(), nextX, nextY, 10): return True
+    return False
+
 
 def checkEnemyMove(direction, posx, posy):
     if direction == "Up" or direction == "Down":
-        if direction == "Up" and obstaclesCheck(posx, posy+20) == True: return direction
-        elif direction == "Down" and obstaclesCheck(posx, posy-20) == True: return direction
-        elif obstaclesCheck(posx+20, posy) == True and obstaclesCheck(posx-20, posy) == False: return "Right"
-        elif obstaclesCheck(posx+20, posy) == False and obstaclesCheck(posx-20, posy) == True: return "Left"
-        elif obstaclesCheck(posx+20, posy) == True and obstaclesCheck(posx-20, posy) == True: 
+        if direction == "Up" and not obstaclesCheck(posx, posy+20) : return direction
+        elif direction == "Down" and not obstaclesCheck(posx, posy-20) : return direction
+        elif not obstaclesCheck(posx+20, posy) and obstaclesCheck(posx-20, posy): return "Right"
+        elif obstaclesCheck(posx+20, posy) and not obstaclesCheck(posx-20, posy): return "Left"
+        elif not obstaclesCheck(posx+20, posy) and not obstaclesCheck(posx-20, posy): 
             if distance(player.xcor(), player.ycor(), posx+20, posy) < distance(player.xcor(), player.ycor(), posx-20, posy): 
                 return "Right"
             else: return "Left"
     elif direction == "Left" or direction == "Right":
-        if direction == "Left" and obstaclesCheck(posx-20, posy) == True: return direction
-        elif direction == "Right" and obstaclesCheck(posx+20, posy) == True: return direction
-        elif obstaclesCheck(posx, posy+20) == True and obstaclesCheck(posx, posy-20) == False: return "Up"
-        elif obstaclesCheck(posx, posy+20) == False and obstaclesCheck(posx, posy-20) == True: return "Down"
-        elif obstaclesCheck(posx, posy+20) == True and obstaclesCheck(posx, posy-20) == True: 
+        if direction == "Left" and not obstaclesCheck(posx-20, posy): return direction
+        elif direction == "Right" and not obstaclesCheck(posx+20, posy): return direction
+        elif not obstaclesCheck(posx, posy+20) and obstaclesCheck(posx, posy-20): return "Up"
+        elif obstaclesCheck(posx, posy+20) and not obstaclesCheck(posx, posy-20): return "Down"
+        elif not obstaclesCheck(posx, posy+20) and not obstaclesCheck(posx, posy-20): 
             if distance(player.xcor(), player.ycor(), posx, posy+20) < distance(player.xcor(), player.ycor(), posx, posy-20): 
                 return "Up"
             else: return "Down"
@@ -226,7 +282,7 @@ def moveEnemy():
         
         if distance(player.xcor(), player.ycor(), en.xcor(), en.ycor()) > 200:
             if en.direction == "Up" :
-                if obstaclesCheck(x, y+20) == False:
+                if obstaclesCheck(x, y+20):
                     y -= en.speed
                     en.direction = "Down"
                 else: 
@@ -237,7 +293,7 @@ def moveEnemy():
                         en.direction = "Up"
                         y += en.speed
             elif en.direction == "Down" :
-                if obstaclesCheck(x, y-20) == False:
+                if obstaclesCheck(x, y-20):
                     y += en.speed
                     en.direction = "Up"
                 else:
@@ -248,7 +304,7 @@ def moveEnemy():
                         en.direction = "Down"
                         y -= en.speed
             elif en.direction == "Left" :
-                if obstaclesCheck(x-20, y) == False:
+                if obstaclesCheck(x-20, y):
                     x += en.speed
                     en.direction = "Right"
                 else:
@@ -259,7 +315,7 @@ def moveEnemy():
                         en.direction = "Left"
                         x -= en.speed
             elif en.direction == "Right" :
-                if obstaclesCheck(x+20, y) == False:
+                if obstaclesCheck(x+20, y):
                     x -= en.speed
                     en.direction = "Left"
                 else:
@@ -305,69 +361,91 @@ def clearAll():
     
     for en in enemies:
         en.goto(9999999,9999999)
-
+        
+    for food in foods:
+        food.goto(9999999,9999999)
+    
+    foods.clear()
     obs.clear()
     enemies.clear()     
-    print(obs)
-    print(enemies)
 
-        
 def setPlayerToSpawn():
     player.setx(-280)
     player.sety(0)
     player.direction = "stop"
 
 def isGoalAchieved():
-    if player.distance(goal) < 20.0 : return True
+    if player.distance(goal) < 20.0 and foodsQty <= 0: return True
     else : return False
         
-def setLevel(toLevel):
-    global level
-    level = toLevel
-        
+
 def goToNextLevel():
     clearAll()
     setPlayerToSpawn()
 
-    currLevel = level
-    setLevel(currLevel + 1)
-    updateText()
+    setLevel(level + 1)
+    updatelevelText()
     
-    currObs = obsQty
-    currEnemies = enemiesQty
-    
-    currObs += 2
-    setObstacles(currObs)
-
+    setObstaclesQty(obsQty + 2)
     initObstacles()
-
-    if level % 4 == 0 :
-        currEnemies += 1
-        setEnemiesQty(currEnemies)
-
-
+    
+    if level % 4 == 0 : setEnemiesQty(enemiesQty + 1)
     initEnemies()
-       
-def setObstacles(obs):
-    global obsQty
-    obsQty = obs
 
-def setEnemiesQty(enemies):
-    global enemiesQty
-    enemiesQty = enemies
+    foodsMaxQty
+    setFoodMaxQty(foodsMaxQty + 1)
+    setFoodQty(foodsMaxQty + 1)
+    initFoods()
 
-def updateText():
-    text.clear()
+def updatelevelText():
+    levelText.clear()
     string = "Level : " + str(level) 
-    text.write(string, align = "center", font = ("Arial", 24, "normal"))
+    levelText.write(string, align = "center", font = ("Arial", 24, "normal"))
+
+def updateScoreText():
+    string = "Score : " + str(score)
+    scoreText.clear()
+    scoreText.write(string, align = "center", font = ("Arial", 24, "normal"))
+
+def isCollideWithEnemy():
+    for en in enemies:
+        if isInRangeOfPoint(en.xcor(), en.ycor(), player.xcor(), player.ycor(), 20.0) : return True
+    return False
+
+def isCollideWithFood():
+    for i in range(foodsQty):
+        if isInRangeOfPoint(foods[i].xcor(), foods[i].ycor(), player.xcor(), player.ycor(), 20.0) : 
+            foods[i].goto(-5000,5000)
+            foods.pop(i)
+            setFoodQty(foodsQty - 1)
+            return True
+    return False        
+
+def gameOver():
+    setLevel(1)
+    setScore(0)
+    updatelevelText()
+    updateScoreText()
+    clearAll()
+    setPlayerToSpawn()
+    setObstaclesQty(DEFAULT_MAX_OBS)
+    setEnemiesQty(DEFAULT_MAX_ENEMIES)
+    setFoodQty(DEFAULT_MAX_FOODS)
+    initObstacles()
+    initEnemies()
+    initFoods()
+    gameOverText.write("GAME OVER", align = "center", font = ("Arial", 24, "normal"))
+    time.sleep(3)
+    gameOverText.clear()
+
 
 # ========= FUNCTIONS ========= #
 
-
-def Main():
+if __name__ == "__main__":
     border()
     initObstacles()
     initEnemies()
+    initFoods()
 
     window.listen()
     window.onkey(moveUp, "w")
@@ -378,10 +456,11 @@ def Main():
     while True:
         window.update()
         moveEnemy()
-        if isGoalAchieved() == True : goToNextLevel()
-        time.sleep(0.1)
+        if isGoalAchieved() : goToNextLevel()
+        if isCollideWithEnemy() : gameOver()
+        if isCollideWithFood():
+            setScore(score + 10)
+            updateScoreText()
+        time.sleep(DELAY)
 
     window.mainloop()
-
-if __name__ == "__main__":
-    Main()
