@@ -168,33 +168,32 @@ def moveRight():
     if mapLimit(x+20, y) == True: return False
     player.setx(x + 20)
 
+def isInRangeOfPoint(a,b,x,y,radius):
+    circle = (x - a) ** 2 + (y - b) ** 2
+    if circle <= radius ** 2 : return True 
+    elif circle > radius ** 2: return False
+
 def obstaclesCheck(nextX, nextY):
     for i in range(MAX_OBS):
-        if abs(nextX - obs[i].xcor()) < 20  and abs(nextY - obs[i].ycor()) < 20 : return False
+        if isInRangeOfPoint(obs[i].xcor(), obs[i].ycor(), nextX, nextY, 19) == True: return False
     return True
 
 def checkEnemyMove(direction, posx, posy):
     if direction == "Up" or direction == "Down":
-        if direction == "Up" and obstaclesCheck(posx, posy+20) == True :
-            return direction
-        elif direction == "Down" and obstaclesCheck(posx, posy-20) == True:
-            return direction
-        elif  obstaclesCheck(posx+20, posy) == False and obstaclesCheck(posx-20, posy) == False:
-            if direction == "Up": return "Down"
-            else: return direction
-        else: 
+        if direction == "Up" and obstaclesCheck(posx, posy+20) == True: return direction
+        elif direction == "Down" and obstaclesCheck(posx, posy-20) == True: return direction
+        elif obstaclesCheck(posx+20, posy) == True and obstaclesCheck(posx-20, posy) == False: return "Right"
+        elif obstaclesCheck(posx+20, posy) == False and obstaclesCheck(posx-20, posy) == True: return "Left"
+        elif obstaclesCheck(posx+20, posy) == True and obstaclesCheck(posx-20, posy) == True: 
             if distance(player.xcor(), player.ycor(), posx+20, posy) < distance(player.xcor(), player.ycor(), posx-20, posy): 
                 return "Right"
             else: return "Left"
     elif direction == "Left" or direction == "Right":
-        if direction == "Left" and obstaclesCheck(posx-20, posy) == True:
-            return direction
-        elif direction == "Right" and obstaclesCheck(posx+20, posy) == True:
-            return direction
-        elif  obstaclesCheck(posx, posy+20) == False and obstaclesCheck(posx, posy-20) == False:
-            if direction == "Left": return "Right"
-            else: return direction
-        else: 
+        if direction == "Left" and obstaclesCheck(posx-20, posy) == True: return direction
+        elif direction == "Right" and obstaclesCheck(posx+20, posy) == True: return direction
+        elif obstaclesCheck(posx, posy+20) == True and obstaclesCheck(posx, posy-20) == False: return "Up"
+        elif obstaclesCheck(posx, posy+20) == False and obstaclesCheck(posx, posy-20) == True: return "Down"
+        elif obstaclesCheck(posx, posy+20) == True and obstaclesCheck(posx, posy-20) == True: 
             if distance(player.xcor(), player.ycor(), posx, posy+20) < distance(player.xcor(), player.ycor(), posx, posy-20): 
                 return "Up"
             else: return "Down"
