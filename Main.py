@@ -183,7 +183,7 @@ def initEnemies():
             posx = random.randint(-14, 14) * 20 
             posy = random.randint(-14, 14) * 20
             for j in range(obsQty):
-                if isInRangeOfPoint(posx, posy, obs[j].xcor(), obs[j].ycor(), 10):
+                if not isInRangeOfPoint(posx, posy, obs[j].xcor(), obs[j].ycor(), 10.0):
                     check = True
                 else: 
                     check = False
@@ -213,13 +213,14 @@ def initFoods():
             posx = random.randint(-14, 14) * 20 
             posy = random.randint(-14, 14) * 20
             for j in range(obsQty):
-                if abs(posx - obs[j].xcor()) >= 20 or abs(posy - obs[j].ycor()) >= 20:
+                if not isInRangeOfPoint(posx, posy, obs[j].xcor(), obs[j].ycor(), 10.0):
                     check = True
                 else: 
                     check = False
                     break
+            if not check: continue
             for j in range(enemiesQty):
-                if abs(posx - enemies[j].xcor()) >= 20 and abs(posy - enemies[j].ycor()) >= 20:
+                if not isInRangeOfPoint(posx, posy, enemies[j].xcor(), enemies[j].ycor(), 10.0):
                     check = True
                 else: 
                     check = False
@@ -243,19 +244,21 @@ def initPowerUps():
             posx = random.randint(-14, 14) * 20 
             posy = random.randint(-14, 14) * 20
             for j in range(obsQty):
-                if abs(posx - obs[j].xcor()) >= 20 or abs(posy - obs[j].ycor()) >= 20:
+                if not isInRangeOfPoint(posx, posy, obs[j].xcor(), obs[j].ycor(), 10.0):
                     check = True
                 else: 
                     check = False
                     break
+            if not check: continue
             for j in range(enemiesQty):
-                if abs(posx - enemies[j].xcor()) >= 20 and abs(posy - enemies[j].ycor()) >= 20:
+                if not isInRangeOfPoint(posx, posy, enemies[j].xcor(), enemies[j].ycor(), 10.0):
                     check = True
                 else: 
                     check = False
                     break
+            if not check: continue
             for j in range(foodsQty):
-                if abs(posx - foods[j].xcor()) >= 20 and abs(posy - foods[j].ycor()) >= 20:
+                if not isInRangeOfPoint(posx, posy, foods[j].xcor(), foods[j].ycor(), 10.0):
                     check = True
                 else: 
                     check = False
@@ -311,7 +314,7 @@ def isInRangeOfPoint(a,b,x,y,radius):
 
 def obstaclesCheck(nextX, nextY):
     for i in range(obsQty):
-        if isInRangeOfPoint(obs[i].xcor(), obs[i].ycor(), nextX, nextY, 20.0): return True
+        if isInRangeOfPoint(obs[i].xcor(), obs[i].ycor(), nextX, nextY, 10.0): return True
     return False
 
 
@@ -457,8 +460,8 @@ def goToNextLevel():
     initEnemies()
 
     # foodsMaxQty
+    setFoodQty(foodsMaxQty + 1)
     setFoodMaxQty(foodsMaxQty + 1)
-    setFoodQty(foodsMaxQty + 1) 
     initFoods()
 
 def updatelevelText():
@@ -473,12 +476,12 @@ def updateScoreText():
 
 def isCollideWithEnemy():
     for en in enemies:
-        if isInRangeOfPoint(en.xcor(), en.ycor(), player.xcor(), player.ycor(), 20.0) : return True
+        if isInRangeOfPoint(en.xcor(), en.ycor(), player.xcor(), player.ycor(), 10.0) : return True
     return False
 
 def isCollideWithFood():
     for i in range(foodsQty):
-        if isInRangeOfPoint(foods[i].xcor(), foods[i].ycor(), player.xcor(), player.ycor(), 20.0) : 
+        if isInRangeOfPoint(foods[i].xcor(), foods[i].ycor(), player.xcor(), player.ycor(), 10.0) : 
             foods[i].goto(INVALID_CONSTANT,INVALID_CONSTANT)
             foods.pop(i)
             setFoodQty(foodsQty - 1)
@@ -487,12 +490,12 @@ def isCollideWithFood():
 
 def isCollideWithPowerUp():
     for i in range(powerUpsQty):
-        if(isInRangeOfPoint(powerUps[i].xcor(), powerUps[i].ycor, player.xcor(), player.ycor(), 20.0)):
+        if(isInRangeOfPoint(powerUps[i].xcor(), powerUps[i].ycor, player.xcor(), player.ycor(), 10.0)):
             powerUps[i].goto(INVALID_CONSTANT,INVALID_CONSTANT)
             powerUps.pop(i)
             setPowerUpQty(powerUpsQty - 1)
-            return True
-    return False
+            return i
+    return -1
 
 def gameOver():
     setLevel(1)
@@ -535,12 +538,13 @@ if __name__ == "__main__":
         if isCollideWithFood():
             setScore(score + 10)
             updateScoreText()
-        if isCollideWithPowerUp() == 1:
-            powerUps
-        elif isCollideWithPowerUp() == 2:
-            powerUps
-        elif isCollideWithPowerUp() == 3:
-            powerUps
+        # PU = isCollideWithPowerUp() 
+        # if PU == 0:
+        #     continue
+        # elif PU == 1:
+        #     continue
+        # elif PU == 2:
+        #     continue
         time.sleep(DELAY)
 
     window.mainloop()
