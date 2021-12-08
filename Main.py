@@ -189,7 +189,7 @@ def initObstacles():
         ob.penup()
         ob.goto(posx, posy)
         ob.color("green")
-        ob.shape("triangle")
+        ob.shape("wall.gif")
         obs.append(ob)
 
 def initEnemies():
@@ -213,7 +213,7 @@ def initEnemies():
         en.penup()
         en.setposition(posx, posy)
         en.color("red")
-        en.shape("circle")
+        en.shape("enemy.gif")
         direction = random.randint(1,4)
         if direction == 1 : en.direction = "Up"
         elif direction == 2 : en.direction = "Down"
@@ -249,7 +249,7 @@ def initFoods():
         food.penup()
         food.goto(posx, posy)
         food.color("pink")
-        food.shape("turtle")
+        food.shape("energy1.gif")
         foods.append(food)
 
 def initPowerUps():
@@ -287,7 +287,8 @@ def initPowerUps():
         power.penup()
         power.goto(posx, posy)
         power.color("white")
-        power.shape("square")
+        power.shape("powerUp.gif")
+        power.shapesize(10,10,70)
         powerUps.append(power)
 
 def outOfMapLimit(posx, posy):
@@ -543,10 +544,16 @@ def gameOver():
     time.sleep(3)
     gameOverText.clear()
 
+def registerShape():
+    turtle.register_shape("powerUp.gif")
+    turtle.register_shape("wall.gif")
+    turtle.register_shape("enemy.gif")
+    turtle.register_shape("energy1.gif")
 
 # ========= FUNCTIONS ========= #
 
 if __name__ == "__main__":
+    registerShape()
     border()
     initObstacles()
     initEnemies()
