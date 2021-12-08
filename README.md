@@ -13,3 +13,5 @@ TODO
 11. Bikin constraint kalo musuh kena obstacles gabisa 
 12. Bikin Goal
 13. Bikin kalo player.distance(goal) < 20 then win
+14. musuh harus lewati diatas item ato food
+15. harus ada indikator stage clear dan jeda next level
