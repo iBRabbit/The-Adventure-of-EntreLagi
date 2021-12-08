@@ -206,7 +206,7 @@ def initEnemies():
                 else: 
                     check = False
                     break
-            if posx == -280 and posy == 0 or posx == 280 and posy == 0: check = False
+            if posx >= -280 and posx <= -120 and posy >= -160 and posy <= 160 or posx == 280 and posy == 0: check = False
 
         en = turtle.Turtle()
         en.speed = 1
@@ -473,18 +473,18 @@ def goToNextLevel():
     
     setObstaclesQty(obsQty + 2)
     initObstacles()
-    
-    setSuperSpeed(0)
-    setInvincible(0)
-    setThroughTheWall(0)
 
     if level % 4 == 0 : setEnemiesQty(enemiesQty + 1)
     initEnemies()
 
-    # foodsMaxQty
     setFoodQty(foodsMaxQty + 1)
     setFoodMaxQty(foodsMaxQty + 1)
     initFoods()
+    
+    setSuperSpeed(0)
+    setInvincible(0)
+    setThroughTheWall(0)
+    initPowerUps()
 
 def updatelevelText():
     levelText.clear()
@@ -516,6 +516,14 @@ def isCollideWithPowerUp():
             powerUps[i].goto(INVALID_CONSTANT,INVALID_CONSTANT)
             return i
     return -1
+
+def getPowerUp(PU):
+    if PU == 0:
+        setSuperSpeed(1)
+    elif PU == 1:
+        setInvincible(1)
+    elif PU == 2:
+        setThroughTheWall(1)
 
 def gameOver():
     setLevel(1)
@@ -559,12 +567,7 @@ if __name__ == "__main__":
             setScore(score + 10)
             updateScoreText()
         PU = isCollideWithPowerUp()
-        if PU == 0:
-            setSuperSpeed(1)
-        elif PU == 1:
-            setInvincible(1)
-        elif PU == 2:
-            setThroughTheWall(1)
+        if PU != -1: getPowerUp(PU)
         time.sleep(DELAY)
 
     window.mainloop()
