@@ -332,7 +332,6 @@ def obstaclesCheck(nextX, nextY):
         if isInRangeOfPoint(obs[i].xcor(), obs[i].ycor(), nextX, nextY, 10.0): return True
     return False
 
-
 def checkEnemyMove(direction, posx, posy):
     if direction == "Up" or direction == "Down":
         if direction == "Up" and not obstaclesCheck(posx, posy+20) : return direction
