@@ -1,3 +1,4 @@
+from operator import truediv
 import turtle
 import time
 import random
@@ -10,6 +11,7 @@ MAP_SIZE_Y = 600
 DEFAULT_MAX_OBS = 50
 DEFAULT_MAX_ENEMIES = 5
 DEFAULT_MAX_FOODS = 3
+DEFAULT_MAX_POWERUPS = 3
 INVALID_CONSTANT = -99999
 
 level = 1
@@ -18,6 +20,7 @@ obsQty = DEFAULT_MAX_OBS
 enemiesQty = DEFAULT_MAX_ENEMIES
 foodsQty = DEFAULT_MAX_FOODS
 foodsMaxQty = DEFAULT_MAX_FOODS
+powerUpsQty = DEFAULT_MAX_POWERUPS
 
 window = turtle.Screen() # Screen
 window.title("Pac-Entre-Lagi")
@@ -65,7 +68,8 @@ gameOverText.goto(0,310)
 
 obs = [] # Array of Obstacles
 enemies = [] # Array of Enemies
-foods = []
+foods = [] # Array of Foods
+powerUps = [] # Array of PowerUps
 
 # ========= INIT VARIABLES ========= #
 
@@ -93,6 +97,10 @@ def setFoodQty(foods):
 def setFoodMaxQty(foods):
     global foodsMaxQty
     foodsMaxQty = foods
+
+def setPowerUpQty(power):
+    global powerUpsQty
+    powerUpsQty = power
 # ========= SETTER ======== #        
 
 # ========= FUNCTIONS ========= #
@@ -169,14 +177,18 @@ def initObstacles():
 def initEnemies():
     for i in range(enemiesQty):
         check = False
+        posx = random.randint(-14, 14) * 20 
+        posy = random.randint(-14, 14) * 20
         while not check:
             posx = random.randint(-14, 14) * 20 
             posy = random.randint(-14, 14) * 20
             for j in range(obsQty):
-                if abs(posx - obs[j].xcor()) >= 20 and abs(posy - obs[j].ycor()) >= 20:
+                if isInRangeOfPoint(posx, posy, obs[j].xcor(), obs[j].ycor(), 10):
                     check = True
+                else: 
+                    check = False
                     break
-            if check: break
+            if posx == -280 and posy == 0 or posx == 280 and posy == 0: check = False
 
         en = turtle.Turtle()
         en.speed = 1
@@ -193,13 +205,26 @@ def initEnemies():
 
 def initFoods():
     for i in range(foodsQty):
+        check = False
         posx = random.randint(-14, 14) * 20 
         posy = random.randint(-14, 14) * 20
         
-        while posx == -280 and posy == 0 or posx == 280 and posy == 0:
+        while not check:
             posx = random.randint(-14, 14) * 20 
             posy = random.randint(-14, 14) * 20
-        
+            for j in range(obsQty):
+                if abs(posx - obs[j].xcor()) >= 20 or abs(posy - obs[j].ycor()) >= 20:
+                    check = True
+                else: 
+                    check = False
+                    break
+            for j in range(enemiesQty):
+                if abs(posx - enemies[j].xcor()) >= 20 and abs(posy - enemies[j].ycor()) >= 20:
+                    check = True
+                else: 
+                    check = False
+                    break
+            if posx == -280 and posy == 0 or posx == 280 and posy == 0: check = False
         food = turtle.Turtle()
         food.speed = 0
         food.penup()
@@ -207,7 +232,42 @@ def initFoods():
         food.color("pink")
         food.shape("turtle")
         foods.append(food)
-   
+
+def initPowerUps():
+    for i in range(powerUpsQty):
+        check = False
+        posx = random.randint(-14, 14) * 20 
+        posy = random.randint(-14, 14) * 20
+        
+        while not check:
+            posx = random.randint(-14, 14) * 20 
+            posy = random.randint(-14, 14) * 20
+            for j in range(obsQty):
+                if abs(posx - obs[j].xcor()) >= 20 or abs(posy - obs[j].ycor()) >= 20:
+                    check = True
+                else: 
+                    check = False
+                    break
+            for j in range(enemiesQty):
+                if abs(posx - enemies[j].xcor()) >= 20 and abs(posy - enemies[j].ycor()) >= 20:
+                    check = True
+                else: 
+                    check = False
+                    break
+            for j in range(foodsQty):
+                if abs(posx - foods[j].xcor()) >= 20 and abs(posy - foods[j].ycor()) >= 20:
+                    check = True
+                else: 
+                    check = False
+                    break
+            if posx == -280 and posy == 0 or posx == 280 and posy == 0: check = False
+        power = turtle.Turtle()
+        power.speed = 0
+        power.penup()
+        power.goto(posx, posy)
+        power.color("brown")
+        power.shape("classic")
+        powerUps.append(power)
 
 def outOfMapLimit(posx, posy):
     if posx == 300 or posx == -300 or posy == 300 or posy == -300:
@@ -251,7 +311,7 @@ def isInRangeOfPoint(a,b,x,y,radius):
 
 def obstaclesCheck(nextX, nextY):
     for i in range(obsQty):
-        if isInRangeOfPoint(obs[i].xcor(), obs[i].ycor(), nextX, nextY, 10): return True
+        if isInRangeOfPoint(obs[i].xcor(), obs[i].ycor(), nextX, nextY, 20.0): return True
     return False
 
 
@@ -365,9 +425,13 @@ def clearAll():
     for food in foods:
         food.goto(INVALID_CONSTANT,INVALID_CONSTANT)
     
+    for powerUp in powerUps:
+        powerUp.goto(INVALID_CONSTANT,INVALID_CONSTANT)
+
     foods.clear()
     obs.clear()
-    enemies.clear()     
+    enemies.clear()  
+    powerUps.clear()   
 
 def setPlayerToSpawn():
     player.setx(-280)
@@ -392,9 +456,9 @@ def goToNextLevel():
     if level % 4 == 0 : setEnemiesQty(enemiesQty + 1)
     initEnemies()
 
-    foodsMaxQty
+    # foodsMaxQty
     setFoodMaxQty(foodsMaxQty + 1)
-    setFoodQty(foodsMaxQty + 1)
+    setFoodQty(foodsMaxQty + 1) 
     initFoods()
 
 def updatelevelText():
@@ -421,6 +485,15 @@ def isCollideWithFood():
             return True
     return False        
 
+def isCollideWithPowerUp():
+    for i in range(powerUpsQty):
+        if(isInRangeOfPoint(powerUps[i].xcor(), powerUps[i].ycor, player.xcor(), player.ycor(), 20.0)):
+            powerUps[i].goto(INVALID_CONSTANT,INVALID_CONSTANT)
+            powerUps.pop(i)
+            setPowerUpQty(powerUpsQty - 1)
+            return True
+    return False
+
 def gameOver():
     setLevel(1)
     setScore(0)
@@ -434,6 +507,7 @@ def gameOver():
     initObstacles()
     initEnemies()
     initFoods()
+    initPowerUps()
     gameOverText.write("GAME OVER", align = "center", font = ("Arial", 24, "normal"))
     time.sleep(3)
     gameOverText.clear()
@@ -446,7 +520,7 @@ if __name__ == "__main__":
     initObstacles()
     initEnemies()
     initFoods()
-
+    initPowerUps()
     window.listen()
     window.onkey(moveUp, "w")
     window.onkey(moveDown, "s")
@@ -461,6 +535,12 @@ if __name__ == "__main__":
         if isCollideWithFood():
             setScore(score + 10)
             updateScoreText()
+        if isCollideWithPowerUp() == 1:
+            powerUps
+        elif isCollideWithPowerUp() == 2:
+            powerUps
+        elif isCollideWithPowerUp() == 3:
+            powerUps
         time.sleep(DELAY)
 
     window.mainloop()
