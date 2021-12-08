@@ -1,4 +1,4 @@
-from operator import truediv
+from operator import setitem, truediv
 import turtle
 import time
 import random
@@ -13,6 +13,8 @@ DEFAULT_MAX_ENEMIES = 5
 DEFAULT_MAX_FOODS = 3
 DEFAULT_MAX_POWERUPS = 3
 INVALID_CONSTANT = -99999
+DEFAULT_FALSE = 0
+DEFAULT_TRUE = 1
 
 level = 1
 score = 0
@@ -21,6 +23,10 @@ enemiesQty = DEFAULT_MAX_ENEMIES
 foodsQty = DEFAULT_MAX_FOODS
 foodsMaxQty = DEFAULT_MAX_FOODS
 powerUpsQty = DEFAULT_MAX_POWERUPS
+superSpeed = DEFAULT_FALSE
+invincible = DEFAULT_FALSE
+throughTheWall = DEFAULT_FALSE
+
 
 window = turtle.Screen() # Screen
 window.title("Pac-Entre-Lagi")
@@ -101,6 +107,18 @@ def setFoodMaxQty(foods):
 def setPowerUpQty(power):
     global powerUpsQty
     powerUpsQty = power
+
+def setSuperSpeed(ss):
+    global superSpeed
+    superSpeed = ss
+
+def setInvincible(I):
+    global invincible
+    invincible = I
+    
+def setThroughTheWall(ttw):
+    global throughTheWall
+    throughTheWall = ttw
 # ========= SETTER ======== #        
 
 # ========= FUNCTIONS ========= #
@@ -268,8 +286,8 @@ def initPowerUps():
         power.speed = 0
         power.penup()
         power.goto(posx, posy)
-        power.color("brown")
-        power.shape("classic")
+        power.color("white")
+        power.shape("square")
         powerUps.append(power)
 
 def outOfMapLimit(posx, posy):
@@ -456,6 +474,10 @@ def goToNextLevel():
     setObstaclesQty(obsQty + 2)
     initObstacles()
     
+    setSuperSpeed(0)
+    setInvincible(0)
+    setThroughTheWall(0)
+
     if level % 4 == 0 : setEnemiesQty(enemiesQty + 1)
     initEnemies()
 
@@ -490,10 +512,8 @@ def isCollideWithFood():
 
 def isCollideWithPowerUp():
     for i in range(powerUpsQty):
-        if(isInRangeOfPoint(powerUps[i].xcor(), powerUps[i].ycor, player.xcor(), player.ycor(), 10.0)):
+        if isInRangeOfPoint(powerUps[i].xcor(), powerUps[i].ycor(), player.xcor(), player.ycor(), 10.0):
             powerUps[i].goto(INVALID_CONSTANT,INVALID_CONSTANT)
-            powerUps.pop(i)
-            setPowerUpQty(powerUpsQty - 1)
             return i
     return -1
 
@@ -538,13 +558,13 @@ if __name__ == "__main__":
         if isCollideWithFood():
             setScore(score + 10)
             updateScoreText()
-        # PU = isCollideWithPowerUp() 
-        # if PU == 0:
-        #     continue
-        # elif PU == 1:
-        #     continue
-        # elif PU == 2:
-        #     continue
+        PU = isCollideWithPowerUp()
+        if PU == 0:
+            setSuperSpeed(1)
+        elif PU == 1:
+            setInvincible(1)
+        elif PU == 2:
+            setThroughTheWall(1)
         time.sleep(DELAY)
 
     window.mainloop()
