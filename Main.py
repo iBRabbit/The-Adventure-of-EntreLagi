@@ -3,6 +3,8 @@ import turtle
 import time
 import random
 import math
+import winsound
+# from playsound import playsound
 
 # ========= INIT VARIABLES ========= #
 DELAY = 0.001 # Delay Kedip Layar
@@ -561,6 +563,8 @@ def goToNextLevel():
     setObstaclesQty(obsQty + 2)
     initObstacles()
 
+    winsound.PlaySound("mixkit-arcade-game-complete-or-approved-mission-205.wav", winsound.SND_ASYNC)
+
     if level % 4 == 0 : setEnemiesQty(enemiesQty + 1)
     initEnemies()
 
@@ -635,6 +639,7 @@ def getPowerUp(PUType):
         setPUTime(500)
         player.color("red")
 
+    winsound.PlaySound("mixkit-player-boost-recharging-2040.wav", winsound.SND_ASYNC)
     
 
 def timeReverse():
@@ -679,9 +684,11 @@ def gameOver():
     initFoods()
     clearPowerUps()
     initPowerUps()
+    winsound.PlaySound("mixkit-player-losing-or-failing-2042.wav", winsound.SND_ASYNC)
     gameOverText.write("GAME OVER", align = "center", font = ("Arial", 24, "normal"))
     time.sleep(3)
     gameOverText.clear()
+    
 
 def registerShape():
     turtle.register_shape("powerUp.gif")
@@ -725,6 +732,7 @@ def PUTimer():
 # ========= FUNCTIONS ========= #
 
 if __name__ == "__main__":
+    
     registerShape()
     readHighScore()
     updateScoreText()
@@ -740,6 +748,7 @@ if __name__ == "__main__":
     window.onkey(moveRight, "d")
 
     while True:
+        
         window.update()
         moveEnemy()
         if isGoalAchieved() : goToNextLevel()
