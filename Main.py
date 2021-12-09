@@ -21,6 +21,7 @@ enemiesQty = DEFAULT_MAX_ENEMIES
 foodsQty = DEFAULT_MAX_FOODS
 foodsMaxQty = DEFAULT_MAX_FOODS
 powerUpsQty = DEFAULT_MAX_POWERUPS
+highScore = 0
 longDash = 0
 timeLD = 0
 invincible = 0
@@ -62,7 +63,7 @@ levelText.speed(0)
 levelText.color("white")
 levelText.penup()
 levelText.hideturtle()
-levelText.goto(-220, 310)
+levelText.goto(-240, 310)
 levelText.write("Level : 1", align = "center", font = ("Arial", 24, "normal"))
 
 scoreText = turtle.Turtle()
@@ -70,15 +71,15 @@ scoreText.speed(0)
 scoreText.color("white")
 scoreText.penup()
 scoreText.hideturtle()
-scoreText.goto(220,310)
-scoreText.write("Score : 0", align = "center", font = ("Arial", 24, "normal"))
+scoreText.goto(110,310)
+scoreText.write("Score : 0 High Score : 0", align = "center", font = ("Arial", 24, "normal"))
 
 gameOverText = turtle.Turtle()
 gameOverText.speed(0)
-gameOverText.color("white")
+gameOverText.color("red")
 gameOverText.penup()
 gameOverText.hideturtle()
-gameOverText.goto(0,310)
+gameOverText.goto(0, -340)
 
 obs = [] # Array of Obstacles
 enemies = [] # Array of Enemies
@@ -144,6 +145,11 @@ def setTimeTTW(tTTW):
     global timeTTW
     timeTTW = tTTW
 
+def setHighScore(toScore):
+    global highScore
+    highScore = toScore
+    saveHighScore()
+
 # ========= SETTER ======== #        
 
 # ========= FUNCTIONS ========= #
@@ -202,13 +208,14 @@ def distance(x1,y1,x2,y2): # Akhirnya pelajaran kalkulus selama ini kepake
 
 def initObstacles():
     for i in range(obsQty):
+        check = False
         posx = random.randint(-14, 14) * 20 
         posy = random.randint(-14, 14) * 20
-        
-        while posx == -280 and posy == 0 or posx == 280 and posy == 0:
+        while not check:
             posx = random.randint(-14, 14) * 20 
             posy = random.randint(-14, 14) * 20
-        
+            if (posx == -280 and posy == 0) or (posx == 280 and posy == 0) or (posx == -280 and posy == 20) or (posx == -280 and posy == -20): check = False
+            else: check = True
         ob = turtle.Turtle()
         ob.speed = 0
         ob.penup()
@@ -386,37 +393,38 @@ def checkEnemyMove(enemy_direc, direction, posx, posy): #knowledgeBase
         if enemy_direc != "Down" and not obstaclesCheck(posx, posy+1) : return direction
         elif obstaclesCheck(posx+1, posy) and obstaclesCheck(posx-1, posy): return "Down"
         elif distance(player.xcor(), player.ycor(), posx+1, posy) <= distance(player.xcor(), player.ycor(), posx-1, posy):
-            if not obstaclesCheck(posx+1, posy): return "Right"
+            if enemy_direc != "Left" and not obstaclesCheck(posx+1, posy): return "Right"
             else: return "Left"
         else:
-            if not obstaclesCheck(posx-1, posy): return "Left"
+            if enemy_direc != "Right" and not obstaclesCheck(posx-1, posy): return "Left"
             else: return "Right"
+
     elif direction == "Down":
         if enemy_direc != "Up" and not obstaclesCheck(posx, posy-1) : return direction
         elif obstaclesCheck(posx+1, posy) and obstaclesCheck(posx-1, posy): return "Up"
         elif distance(player.xcor(), player.ycor(), posx+1, posy) <= distance(player.xcor(), player.ycor(), posx-1, posy):
-            if not obstaclesCheck(posx+1, posy): return "Right"
+            if enemy_direc != "Left" and not obstaclesCheck(posx+1, posy): return "Right"
             else: return "Left"
         else:
-            if not obstaclesCheck(posx-1, posy): return "Left"
+            if enemy_direc != "Right" and not obstaclesCheck(posx-1, posy): return "Left"
             else: return "Right"
     elif direction == "Left":
         if enemy_direc != "Right" and not obstaclesCheck(posx-1, posy): return direction
         elif obstaclesCheck(posx, posy+1) and obstaclesCheck(posx, posy-1): return "Right"
         elif distance(player.xcor(), player.ycor(), posx, posy+1) <= distance(player.xcor(), player.ycor(), posx, posy-1):
-            if not obstaclesCheck(posx, posy+1): return "Up"
+            if enemy_direc != "Down" and not obstaclesCheck(posx, posy+1): return "Up"
             else: return "Down"
         else:
-            if not obstaclesCheck(posx, posy-1): return "Down"
+            if enemy_direc != "Up" and not obstaclesCheck(posx, posy-1): return "Down"
             else: return "Up"
     elif direction == "Right":
         if enemy_direc != "Left" and not obstaclesCheck(posx+1, posy): return direction
         elif obstaclesCheck(posx, posy+1) and obstaclesCheck(posx, posy-1): return "Left"
         elif distance(player.xcor(), player.ycor(), posx, posy+1) <= distance(player.xcor(), player.ycor(), posx, posy-1):
-            if not obstaclesCheck(posx, posy+1): return "Up"
+            if enemy_direc != "Down" and not obstaclesCheck(posx, posy+1): return "Up"
             else: return "Down"
         else:
-            if not obstaclesCheck(posx, posy-20): return "Down"
+            if enemy_direc != "Up" and not obstaclesCheck(posx, posy-20): return "Down"
             else: return "Up"
 
 def moveEnemy():
@@ -482,20 +490,20 @@ def moveEnemy():
 
         minimum = min(distances, key = distances.get)
         minimum = checkEnemyMove(en.direction, minimum, x, y)
-        
-        if minimum == "Up" and distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()) < en.distance(player) : 
+
+        if minimum == "Up": 
             y += en.speed
             en.direction = "Up"
-        elif minimum == "Down" and distance(en.xcor(), en.ycor() - 20, player.xcor(), player.ycor()) < en.distance(player) : 
-            y += -en.speed
+        elif minimum == "Down": 
+            y -= en.speed
             en.direction = "Down"
-        elif minimum == "Left" and distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player) : 
-            x += -en.speed
+        elif minimum == "Left": 
+            x -= en.speed
             en.direction = "Left"
-        elif minimum == "Right" and distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player) : 
-            x += +en.speed
+        elif minimum == "Right":
+            x += en.speed
             en.direction = "Right"
-          
+
         en.sety(y)
         en.setx(x)
     
@@ -561,7 +569,7 @@ def updatelevelText():
     levelText.write(string, align = "center", font = ("Arial", 24, "normal"))
 
 def updateScoreText():
-    string = "Score : " + str(score)
+    string = "Score : " + str(score) + "      High Score : " + str(highScore)
     scoreText.clear()
     scoreText.write(string, align = "center", font = ("Arial", 24, "normal"))
 
@@ -638,6 +646,7 @@ def timeThroughTheWall():
 def gameOver():
     setLevel(1)
     setScore(0)
+    # setHighScore(0)
     updatelevelText()
     updateScoreText()
     clearAll()
@@ -660,10 +669,24 @@ def registerShape():
     turtle.register_shape("enemy.gif")
     turtle.register_shape("energy1.gif")
 
+def readHighScore():
+    file = open("highscore.txt", "rt")
+    setHighScore(int(file.read()))
+    file.close()
+
+def saveHighScore():
+    file = open("highscore.txt", "w")
+    temp = highScore
+    string = str(temp)
+    file.write(string)
+    file.close()
+
 # ========= FUNCTIONS ========= #
 
 if __name__ == "__main__":
     registerShape()
+    readHighScore()
+    updateScoreText()
     border()
     initObstacles()
     initEnemies()
@@ -682,6 +705,7 @@ if __name__ == "__main__":
         if isCollideWithEnemy() and invincible == 0: gameOver()
         if isCollideWithFood():
             setScore(score + 10)
+            if score >= highScore : setHighScore(int(score))
             updateScoreText()
         PU = isCollideWithPowerUp()
         if PU != -1: 
