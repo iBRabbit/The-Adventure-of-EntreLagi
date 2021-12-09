@@ -370,28 +370,42 @@ def isInRangeOfPoint(a,b,x,y,radius):
 
 def obstaclesCheck(nextX, nextY):
     for i in range(obsQty):
-        if isInRangeOfPoint(obs[i].xcor(), obs[i].ycor(), nextX, nextY, 10.0): return True
+        if isInRangeOfPoint(nextX, nextY, obs[i].xcor(), obs[i].ycor(), 10.0): return True
     return False
 
 def checkEnemyMove(direction, posx, posy):
-    if direction == "Up" or direction == "Down":
-        if direction == "Up" and not obstaclesCheck(posx, posy+20) : return direction
-        elif direction == "Down" and not obstaclesCheck(posx, posy-20) : return direction
-        elif not obstaclesCheck(posx+20, posy) and obstaclesCheck(posx-20, posy): return "Right"
-        elif obstaclesCheck(posx+20, posy) and not obstaclesCheck(posx-20, posy): return "Left"
-        elif not obstaclesCheck(posx+20, posy) and not obstaclesCheck(posx-20, posy): 
-            if distance(player.xcor(), player.ycor(), posx+20, posy) < distance(player.xcor(), player.ycor(), posx-20, posy): 
-                return "Right"
+    if direction == "Up":
+        if not obstaclesCheck(posx, posy+1) : return direction
+        if distance(player.xcor(), player.ycor(), posx+1, posy) < distance(player.xcor(), player.ycor(), posx-1, posy):
+            if not obstaclesCheck(posx+1, posy): return "Right"
             else: return "Left"
-    elif direction == "Left" or direction == "Right":
-        if direction == "Left" and not obstaclesCheck(posx-20, posy): return direction
-        elif direction == "Right" and not obstaclesCheck(posx+20, posy): return direction
-        elif not obstaclesCheck(posx, posy+20) and obstaclesCheck(posx, posy-20): return "Up"
-        elif obstaclesCheck(posx, posy+20) and not obstaclesCheck(posx, posy-20): return "Down"
-        elif not obstaclesCheck(posx, posy+20) and not obstaclesCheck(posx, posy-20): 
-            if distance(player.xcor(), player.ycor(), posx, posy+20) < distance(player.xcor(), player.ycor(), posx, posy-20): 
-                return "Up"
+        else:
+            if not obstaclesCheck(posx-1, posy): return "Left"
+            else: return "Right"
+    elif direction == "Down":
+        if not obstaclesCheck(posx, posy-1) : return direction
+        if distance(player.xcor(), player.ycor(), posx+1, posy) < distance(player.xcor(), player.ycor(), posx-1, posy):
+            if not obstaclesCheck(posx+1, posy): return "Right"
+            else: return "Left"
+        else:
+            if not obstaclesCheck(posx-1, posy): return "Left"
+            else: return "Right"
+    elif direction == "Left":
+        if not obstaclesCheck(posx-1, posy): return direction
+        if distance(player.xcor(), player.ycor(), posx, posy+1) < distance(player.xcor(), player.ycor(), posx, posy-1):
+            if not obstaclesCheck(posx, posy+1): return "Up"
             else: return "Down"
+        else:
+            if not obstaclesCheck(posx, posy-1): return "Down"
+            else: return "Up"
+    elif direction == "Right":
+        if not obstaclesCheck(posx+1, posy): return direction
+        if distance(player.xcor(), player.ycor(), posx, posy+1) < distance(player.xcor(), player.ycor(), posx, posy-1):
+            if not obstaclesCheck(posx, posy+1): return "Up"
+            else: return "Down"
+        else:
+            if not obstaclesCheck(posx, posy-20): return "Down"
+            else: return "Up"
 
 def moveEnemy():
     for en in enemies:
@@ -450,24 +464,24 @@ def moveEnemy():
         distances = {
             "Up" : distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()),
             "Down" : distance(en.xcor(), en.ycor() - 20, player.xcor(), player.ycor()),
-            "Left" : distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor()),
-            "Right" : distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor())
+            "Left" : distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()),
+            "Right" : distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor())
         }
 
         minimum = min(distances, key = distances.get)
         minimum = checkEnemyMove(minimum, x, y)
         
-        if minimum == "Up" and distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()) < en.distance(player) : 
+        if minimum == "Up": #and distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()) < en.distance(player) : 
             y += en.speed
             en.direction = "Up"
-        elif minimum == "Down" and distance(en.xcor(), en.ycor() - 20, player.xcor(), player.ycor()) < en.distance(player) : 
+        elif minimum == "Down": #and distance(en.xcor(), en.ycor() - 20, player.xcor(), player.ycor()) < en.distance(player) : 
             y += -en.speed
             en.direction = "Down"
-        elif minimum == "Left" and distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player) : 
-            x += en.speed
-            en.direction = "Left"
-        elif minimum == "Right" and distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player) : 
+        elif minimum == "Left": #and distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player) : 
             x += -en.speed
+            en.direction = "Left"
+        elif minimum == "Right": #and distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor()) < en.distance(player) : 
+            x += +en.speed
             en.direction = "Right"
           
         en.sety(y)
