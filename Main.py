@@ -11,7 +11,7 @@ MAP_SIZE_Y = 600
 DEFAULT_MAX_OBS = 50
 DEFAULT_MAX_ENEMIES = 5
 DEFAULT_MAX_FOODS = 3
-DEFAULT_MAX_POWERUPS = 3
+DEFAULT_MAX_POWERUPS = 4
 INVALID_CONSTANT = -99999
 
 level = 1
@@ -23,11 +23,11 @@ foodsMaxQty = DEFAULT_MAX_FOODS
 powerUpsQty = DEFAULT_MAX_POWERUPS
 highScore = 0
 longDash = 0
-timeLD = 0
 invincible = 0
-timeI = 0
 throughTheWall = 0
-timeTTW = 0
+reversedMove = 0
+PUTime = 0
+PUType = -1
 
 window = turtle.Screen() # Screen
 window.title("Pac-Entre-Lagi")
@@ -124,32 +124,29 @@ def setPowerUpQty(power):
 def setLongDash(ld):
     global longDash
     longDash = ld
-
-def setTimeLD(tLD): 
-    global timeLD
-    timeLD = tLD
-
+    
 def setInvincible(I):
     global invincible
     invincible = I
 
-def setTimeI(tI):    
-    global timeI
-    timeI = tI
-    
 def setThroughTheWall(ttw):
     global throughTheWall
     throughTheWall = ttw
-    
-def setTimeTTW(tTTW):
-    global timeTTW
-    timeTTW = tTTW
 
+def setPUTime(time):
+    global PUTime
+    PUTime = time
+    
 def setHighScore(toScore):
     global highScore
     highScore = toScore
     saveHighScore()
 
+
+def setPUType(typeP):
+    global PUType
+    PUType = typeP
+    
 # ========= SETTER ======== #        
 
 # ========= FUNCTIONS ========= #
@@ -330,8 +327,11 @@ def getPlayerCurrentPos():
     # print("[DEBUG] : Player Current Pos -> ", player.pos())
     return curr_x, curr_y
 
-def moveUp():
+def moveUp(reverseCheck = True):
     x,y = getPlayerCurrentPos()
+    
+    if reversedMove == 1 and reverseCheck == True: return moveDown(False)
+    
     if longDash == 1:
         if obstaclesCheck(x, y + 40): return False
         if outOfMapLimit(x, y+40): return False
@@ -342,8 +342,11 @@ def moveUp():
         player.sety(y + 20)
     setPlayerDirection("Up")
 
-def moveDown():
+def moveDown(reverseCheck = True):
     x,y = getPlayerCurrentPos()
+    
+    if reversedMove == 1 and reverseCheck == True: return moveUp(False)
+    
     if longDash == 1:
         if obstaclesCheck(x, y - 40): return False
         if outOfMapLimit(x, y-40): return False
@@ -354,8 +357,11 @@ def moveDown():
         player.sety(y - 20)
     setPlayerDirection("Down")
 
-def moveLeft():
+def moveLeft(reverseCheck = True):
     x,y = getPlayerCurrentPos()
+    
+    if reversedMove == 1 and reverseCheck == True : return moveRight(False)
+    
     if longDash == 1:
         if obstaclesCheck(x - 40, y): return False
         if outOfMapLimit(x-40, y): return False
@@ -366,8 +372,11 @@ def moveLeft():
         player.setx(x - 20)
     setPlayerDirection("Left")
 
-def moveRight():
+def moveRight(reverseCheck = True):
     x,y = getPlayerCurrentPos()
+    
+    if reversedMove == 1 and reverseCheck == True: return moveLeft(False)
+    
     if longDash == 1:
         if obstaclesCheck(x + 40, y): return False
         if outOfMapLimit(x+40, y): return False
@@ -535,11 +544,10 @@ def isGoalAchieved():
     else : return False
 
 def clearPowerUps():        
-    setTimeLD(0)
+    setPUTime(0)
     setLongDash(0)
-    setTimeI(0)
     setInvincible(0)
-    setTimeTTW(0)
+    setReverse(0)
     setThroughTheWall(0)
     player.color("aqua")
 
@@ -607,46 +615,58 @@ def isCollideWithPowerUp():
             return i
     return -1
 
-def getPowerUp(PU):
+def getPowerUp(PUType):
     clearPowerUps()
-    if PU == 0:
+    
+    if PUType == 0:
         setLongDash(1)
-        setTimeLD(500)
+        setPUTime(500)
         player.color("purple")
-    elif PU == 1:
+    elif PUType == 1:
         setInvincible(1)
-        setTimeI(500)
+        setPUTime(500)
         player.color("grey")
-    elif PU == 2:
+    elif PUType == 2:
         setThroughTheWall(1)
-        setTimeTTW(500)
+        setPUTime(500)
         player.color("white")
+    elif PUType == 3:
+        setReverse(1)
+        setPUTime(500)
+        player.color("red")
 
+    
+
+def timeReverse():
+    if PUTime <= 0 :
+        setReverse(0)
+        setPUTime(0)
+        player.color("aqua")
+        
 def timeLongDash():
-    setTimeLD(timeLD - 1)
-    if(timeLD <= 0): 
+    if(PUTime<= 0): 
         setLongDash(0)
-        setTimeLD(0)
-        player.color("blue")
+        setPUTime(0)
+        player.color("aqua")
+
 
 def timeInvincible():
-    setTimeI(timeI - 1)
-    if(timeI <= 0): 
+    if(PUTime<= 0): 
         setInvincible(0)
-        setTimeI(0)
-        player.color("blue")
+        setPUTime(0)
+        player.color("aqua")
+
 
 def timeThroughTheWall():
-    setTimeTTW(timeTTW - 1)
-    if(timeTTW <= 0): 
+    if(PUTime<= 0): 
         setThroughTheWall(0)
-        setTimeTTW(0)
-        player.color("blue")
+        setPUTime(0)
+        player.color("aqua")
+
 
 def gameOver():
     setLevel(1)
     setScore(0)
-    # setHighScore(0)
     updatelevelText()
     updateScoreText()
     clearAll()
@@ -681,6 +701,27 @@ def saveHighScore():
     file.write(string)
     file.close()
 
+def setReverse(isActive):
+    global reversedMove
+    reversedMove = isActive
+
+def deactivePU():
+    setPUTime(0)
+    setPUType(-1)
+    setThroughTheWall(0)
+    setInvincible(0)
+    setLongDash(0)
+    setReverse(0)
+    setPUTime(0)
+    player.color("aqua")
+
+def PUTimer():
+    if PUTime > 0:
+        setPUTime(PUTime - 1)
+        if PUTime <= 0 : 
+            deactivePU()
+    
+
 # ========= FUNCTIONS ========= #
 
 if __name__ == "__main__":
@@ -697,7 +738,7 @@ if __name__ == "__main__":
     window.onkey(moveDown, "s")
     window.onkey(moveLeft, "a")
     window.onkey(moveRight, "d")
-    # x = 5
+
     while True:
         window.update()
         moveEnemy()
@@ -707,16 +748,14 @@ if __name__ == "__main__":
             setScore(score + 10)
             if score >= highScore : setHighScore(int(score))
             updateScoreText()
-        PU = isCollideWithPowerUp()
-        if PU != -1: 
-            getPowerUp(PU)
-            PU = -1
-        if timeLD > 0.0:
-            timeLongDash()
-        if timeI > 0.0:
-            timeInvincible()
-        if timeTTW > 0.0:
-            timeThroughTheWall()
+        
+        temp = isCollideWithPowerUp()   
+        if temp >= 0 : 
+            setPUType(temp) 
+            getPowerUp(temp)
+            temp = -1
+            
+        PUTimer()
         time.sleep(DELAY)
 
     window.mainloop()
