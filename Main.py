@@ -83,6 +83,13 @@ gameOverText.penup()
 gameOverText.hideturtle()
 gameOverText.goto(0, -340)
 
+power = turtle.Turtle()
+power.speed(0)
+power.color("red")
+power.penup()
+power.hideturtle()
+power.goto(0,-340)
+
 obs = [] # Array of Obstacles
 enemies = [] # Array of Enemies
 foods = [] # Array of Foods
@@ -638,10 +645,10 @@ def getPowerUp(PUType):
         setReverse(1)
         setPUTime(500)
         player.color("red")
-
+    power.clear()
+    power.write("PowerUp in 5.0 seconds", align = "center", font = ("Arial", 24, "normal"))
     winsound.PlaySound("mixkit-player-boost-recharging-2040.wav", winsound.SND_ASYNC)
     
-
 def timeReverse():
     if PUTime <= 0 :
         setReverse(0)
@@ -727,6 +734,11 @@ def PUTimer():
         setPUTime(PUTime - 1)
         if PUTime <= 0 : 
             deactivePU()
+            power.clear()
+        elif PUTime % 100 == 0:
+            power.clear()
+            textPower = "PowerUp in "+str(PUTime/100)+" seconds"
+            power.write(textPower, align = "center", font = ("Arial", 24, "normal"))
     
 def pauseScreen():
     pause = turtle.Turtle()
