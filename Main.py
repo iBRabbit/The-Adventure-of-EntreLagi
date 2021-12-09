@@ -88,6 +88,10 @@ powerUps = [] # Array of PowerUps
 # ========= INIT VARIABLES ========= #
 
 # ========= SETTER ======== #
+def setPlayerDirection(direction):
+    global player
+    player.direction = direction
+
 def setObstaclesQty(obs):
     global obsQty
     obsQty = obs
@@ -329,6 +333,7 @@ def moveUp():
         if throughTheWall == 0 and obstaclesCheck(x, y + 20): return False
         if outOfMapLimit(x, y+20): return False
         player.sety(y + 20)
+    setPlayerDirection("Up")
 
 def moveDown():
     x,y = getPlayerCurrentPos()
@@ -340,6 +345,7 @@ def moveDown():
         if throughTheWall == 0 and obstaclesCheck(x, y - 20) : return False
         if outOfMapLimit(x, y-20): return False
         player.sety(y - 20)
+    setPlayerDirection("Down")
 
 def moveLeft():
     x,y = getPlayerCurrentPos()
@@ -351,6 +357,7 @@ def moveLeft():
         if throughTheWall == 0 and obstaclesCheck(x - 20, y) : return False
         if outOfMapLimit(x-20, y): return False
         player.setx(x - 20)
+    setPlayerDirection("Left")
 
 def moveRight():
     x,y = getPlayerCurrentPos()
@@ -362,6 +369,7 @@ def moveRight():
         if throughTheWall == 0 and obstaclesCheck(x + 20, y) : return False
         if outOfMapLimit(x+20, y): return False
         player.setx(x + 20)
+    setPlayerDirection("Right")
 
 def isInRangeOfPoint(a,b,x,y,radius):
     if a >= x-radius and a <= x+radius and b >= y-radius and b <= y+radius:
@@ -521,7 +529,7 @@ def clearPowerUps():
     setInvincible(0)
     setTimeTTW(0)
     setThroughTheWall(0)
-    player.color("blue")
+    player.color("aqua")
 
 def goToNextLevel():
     clearAll()
@@ -559,8 +567,21 @@ def isCollideWithEnemy():
     return False
 
 def isCollideWithFood():
+    flag = False
     for i in range(foodsQty):
-        if isInRangeOfPoint(foods[i].xcor(), foods[i].ycor(), player.xcor(), player.ycor(), 10.0) : 
+        if longDash == 1:
+            x = player.xcor()
+            y = player.ycor()
+
+            if player.direction == "Up": y-=20 
+            elif player.direction == "Down": y+=20
+            elif player.direction == "Left": x+=20
+            elif player.direction == "Right": x-=20
+
+            if isInRangeOfPoint(foods[i].xcor(), foods[i].ycor(), x, y, 10.0): flag = True
+
+        elif isInRangeOfPoint(foods[i].xcor(), foods[i].ycor(), player.xcor(), player.ycor(), 10.0): flag = True
+        if flag == True:
             foods[i].goto(INVALID_CONSTANT,INVALID_CONSTANT)
             foods.pop(i)
             setFoodQty(foodsQty - 1)
@@ -575,6 +596,7 @@ def isCollideWithPowerUp():
     return -1
 
 def getPowerUp(PU):
+    clearPowerUps()
     if PU == 0:
         setLongDash(1)
         setTimeLD(500)
@@ -657,8 +679,8 @@ if __name__ == "__main__":
         if isCollideWithFood():
             setScore(score + 10)
             updateScoreText()
-        if longDash == 0 and invincible == 0 and throughTheWall == 0: PU = isCollideWithPowerUp()
-        if PU !=timeLD-1: 
+        PU = isCollideWithPowerUp()
+        if PU != -1: 
             getPowerUp(PU)
             PU = -1
         if timeLD > 0.0:
