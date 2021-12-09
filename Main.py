@@ -94,6 +94,7 @@ obs = [] # Array of Obstacles
 enemies = [] # Array of Enemies
 foods = [] # Array of Foods
 powerUps = [] # Array of PowerUps
+typePower = ["Long Dash ", "Invincible ", "Through The Wall ", "Reverse "]
 
 # ========= INIT VARIABLES ========= #
 
@@ -541,7 +542,8 @@ def clearAll():
     foods.clear()
     obs.clear()
     enemies.clear()  
-    powerUps.clear()   
+    powerUps.clear()
+    power.clear()   
 
 def setPlayerToSpawn():
     player.setx(-280)
@@ -628,7 +630,6 @@ def isCollideWithPowerUp():
 
 def getPowerUp(PUType):
     clearPowerUps()
-    
     if PUType == 0:
         setLongDash(1)
         setPUTime(500)
@@ -646,7 +647,8 @@ def getPowerUp(PUType):
         setPUTime(500)
         player.color("red")
     power.clear()
-    power.write("PowerUp in 5.0 seconds", align = "center", font = ("Arial", 24, "normal"))
+    textPower = typePower[PUType] + "in 5.0 seconds"
+    power.write(textPower, align = "center", font = ("Arial", 24, "normal"))
     winsound.PlaySound("mixkit-player-boost-recharging-2040.wav", winsound.SND_ASYNC)
     
 def timeReverse():
@@ -737,19 +739,19 @@ def PUTimer():
             power.clear()
         elif PUTime % 100 == 0:
             power.clear()
-            textPower = "PowerUp in "+str(PUTime/100)+" seconds"
+            textPower = typePower[PUType]+"in "+str(PUTime/100)+" seconds"
             power.write(textPower, align = "center", font = ("Arial", 24, "normal"))
     
 def pauseScreen():
     pause = turtle.Turtle()
     pause.speed(0)
-    pause.color("red")
+    pause.color("white")
     pause.penup()
     pause.hideturtle()
-    pause.goto(0,-340)
+    pause.goto(0,0)
     list = ["Pause 5 seconds","Pause 4 seconds","Pause 3 seconds","Pause 2 seconds","Pause 1 seconds"]
     for i in list:
-        pause.write(i, align = "center", font = ("Arial", 24, "normal"))
+        pause.write(i, align = "center", font = ("Arial", 40, "normal"))
         time.sleep(1)
         pause.clear()
 
