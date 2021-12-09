@@ -735,9 +735,11 @@ def pauseScreen():
     pause.penup()
     pause.hideturtle()
     pause.goto(0,-340)
-    pause.write("Pause", align = "center", font = ("Arial", 24, "normal"))
-    time.sleep(5)
-    pause.clear()
+    list = ["Pause 5 seconds","Pause 4 seconds","Pause 3 seconds","Pause 2 seconds","Pause 1 seconds"]
+    for i in list:
+        pause.write(i, align = "center", font = ("Arial", 24, "normal"))
+        time.sleep(1)
+        pause.clear()
 
 # ========= FUNCTIONS ========= #
 
