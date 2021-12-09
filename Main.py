@@ -13,8 +13,6 @@ DEFAULT_MAX_ENEMIES = 5
 DEFAULT_MAX_FOODS = 3
 DEFAULT_MAX_POWERUPS = 3
 INVALID_CONSTANT = -99999
-DEFAULT_FALSE = 0
-DEFAULT_TRUE = 1
 
 level = 1
 score = 0
@@ -23,10 +21,12 @@ enemiesQty = DEFAULT_MAX_ENEMIES
 foodsQty = DEFAULT_MAX_FOODS
 foodsMaxQty = DEFAULT_MAX_FOODS
 powerUpsQty = DEFAULT_MAX_POWERUPS
-superSpeed = DEFAULT_FALSE
-invincible = DEFAULT_FALSE
-throughTheWall = DEFAULT_FALSE
-
+longDash = 0
+timeLD = 0
+invincible = 0
+timeI = 0
+throughTheWall = 0
+timeTTW = 0
 
 window = turtle.Screen() # Screen
 window.title("Pac-Entre-Lagi")
@@ -116,17 +116,30 @@ def setPowerUpQty(power):
     global powerUpsQty
     powerUpsQty = power
 
-def setSuperSpeed(ss):
-    global superSpeed
-    superSpeed = ss
+def setLongDash(ld):
+    global longDash
+    longDash = ld
+
+def setTimeLD(tLD): 
+    global timeLD
+    timeLD = tLD
 
 def setInvincible(I):
     global invincible
     invincible = I
+
+def setTimeI(tI):    
+    global timeI
+    timeI = tI
     
 def setThroughTheWall(ttw):
     global throughTheWall
     throughTheWall = ttw
+    
+def setTimeTTW(tTTW):
+    global timeTTW
+    timeTTW = tTTW
+
 # ========= SETTER ======== #        
 
 # ========= FUNCTIONS ========= #
@@ -308,27 +321,47 @@ def getPlayerCurrentPos():
 
 def moveUp():
     x,y = getPlayerCurrentPos()
-    if obstaclesCheck(x, y + 20) : return False
-    if outOfMapLimit(x, y+20): return False
-    player.sety(y + 20)
+    if longDash == 1:
+        if obstaclesCheck(x, y + 40): return False
+        if outOfMapLimit(x, y+40): return False
+        player.sety(y + 40)
+    else:
+        if throughTheWall == 0 and obstaclesCheck(x, y + 20): return False
+        if outOfMapLimit(x, y+20): return False
+        player.sety(y + 20)
 
 def moveDown():
     x,y = getPlayerCurrentPos()
-    if obstaclesCheck(x, y - 20) : return False
-    if outOfMapLimit(x, y-20): return False
-    player.sety(y - 20)
+    if longDash == 1:
+        if obstaclesCheck(x, y - 40): return False
+        if outOfMapLimit(x, y-40): return False
+        player.sety(y - 40)
+    else:
+        if throughTheWall == 0 and obstaclesCheck(x, y - 20) : return False
+        if outOfMapLimit(x, y-20): return False
+        player.sety(y - 20)
 
 def moveLeft():
     x,y = getPlayerCurrentPos()
-    if obstaclesCheck(x - 20, y) : return False
-    if outOfMapLimit(x-20, y): return False
-    player.setx(x - 20)
+    if longDash == 1:
+        if obstaclesCheck(x - 40, y): return False
+        if outOfMapLimit(x-40, y): return False
+        player.setx(x - 40)
+    else:
+        if throughTheWall == 0 and obstaclesCheck(x - 20, y) : return False
+        if outOfMapLimit(x-20, y): return False
+        player.setx(x - 20)
 
 def moveRight():
     x,y = getPlayerCurrentPos()
-    if obstaclesCheck(x + 20, y) : return False
-    if outOfMapLimit(x+20, y): return False
-    player.setx(x + 20)
+    if longDash == 1:
+        if obstaclesCheck(x + 40, y): return False
+        if outOfMapLimit(x+40, y): return False
+        player.setx(x + 40)
+    else:
+        if throughTheWall == 0 and obstaclesCheck(x + 20, y) : return False
+        if outOfMapLimit(x+20, y): return False
+        player.setx(x + 20)
 
 def isInRangeOfPoint(a,b,x,y,radius):
     if a >= x-radius and a <= x+radius and b >= y-radius and b <= y+radius:
@@ -466,7 +499,15 @@ def setPlayerToSpawn():
 def isGoalAchieved():
     if player.distance(goal) < 20.0 and foodsQty <= 0: return True
     else : return False
-        
+
+def clearPowerUps():        
+    setTimeLD(0)
+    setLongDash(0)
+    setTimeI(0)
+    setInvincible(0)
+    setTimeTTW(0)
+    setThroughTheWall(0)
+    player.color("blue")
 
 def goToNextLevel():
     clearAll()
@@ -485,9 +526,7 @@ def goToNextLevel():
     setFoodMaxQty(foodsMaxQty + 1)
     initFoods()
     
-    setSuperSpeed(0)
-    setInvincible(0)
-    setThroughTheWall(0)
+    clearPowerUps()
     initPowerUps()
 
 def updatelevelText():
@@ -523,11 +562,38 @@ def isCollideWithPowerUp():
 
 def getPowerUp(PU):
     if PU == 0:
-        setSuperSpeed(1)
+        setLongDash(1)
+        setTimeLD(500)
+        player.color("purple")
     elif PU == 1:
         setInvincible(1)
+        setTimeI(500)
+        player.color("grey")
     elif PU == 2:
         setThroughTheWall(1)
+        setTimeTTW(500)
+        player.color("white")
+
+def timeLongDash():
+    setTimeLD(timeLD - 1)
+    if(timeLD <= 0): 
+        setLongDash(0)
+        setTimeLD(0)
+        player.color("blue")
+
+def timeInvincible():
+    setTimeI(timeI - 1)
+    if(timeI <= 0): 
+        setInvincible(0)
+        setTimeI(0)
+        player.color("blue")
+
+def timeThroughTheWall():
+    setTimeTTW(timeTTW - 1)
+    if(timeTTW <= 0): 
+        setThroughTheWall(0)
+        setTimeTTW(0)
+        player.color("blue")
 
 def gameOver():
     setLevel(1)
@@ -542,6 +608,7 @@ def gameOver():
     initObstacles()
     initEnemies()
     initFoods()
+    clearPowerUps()
     initPowerUps()
     gameOverText.write("GAME OVER", align = "center", font = ("Arial", 24, "normal"))
     time.sleep(3)
@@ -572,12 +639,20 @@ if __name__ == "__main__":
         window.update()
         moveEnemy()
         if isGoalAchieved() : goToNextLevel()
-        if isCollideWithEnemy() : gameOver()
+        if isCollideWithEnemy() and invincible == 0: gameOver()
         if isCollideWithFood():
             setScore(score + 10)
             updateScoreText()
-        PU = isCollideWithPowerUp()
-        if PU != -1: getPowerUp(PU)
+        if longDash == 0 and invincible == 0 and throughTheWall == 0: PU = isCollideWithPowerUp()
+        if PU !=timeLD-1: 
+            getPowerUp(PU)
+            PU = -1
+        if timeLD > 0.0:
+            timeLongDash()
+        if timeI > 0.0:
+            timeInvincible()
+        if timeTTW > 0.0:
+            timeThroughTheWall()
         time.sleep(DELAY)
 
     window.mainloop()
