@@ -728,6 +728,16 @@ def PUTimer():
         if PUTime <= 0 : 
             deactivePU()
     
+def pauseScreen():
+    pause = turtle.Turtle()
+    pause.speed(0)
+    pause.color("red")
+    pause.penup()
+    pause.hideturtle()
+    pause.goto(0,-340)
+    pause.write("Pause", align = "center", font = ("Arial", 24, "normal"))
+    time.sleep(5)
+    pause.clear()
 
 # ========= FUNCTIONS ========= #
 
@@ -746,6 +756,8 @@ if __name__ == "__main__":
     window.onkey(moveDown, "s")
     window.onkey(moveLeft, "a")
     window.onkey(moveRight, "d")
+    window.onkey(pauseScreen, "space")
+    
 
     while True:
         
