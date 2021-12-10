@@ -30,6 +30,7 @@ throughTheWall = 0
 reversedMove = 0
 PUTime = 0
 PUType = -1
+isPaused = False
 
 window = turtle.Screen() # Screen
 window.title("Pac-Entre-Lagi")
@@ -156,6 +157,11 @@ def setHighScore(toScore):
 def setPUType(typeP):
     global PUType
     PUType = typeP
+
+def setPaused(params):
+    global isPaused
+    isPaused = params
+    
     
 # ========= SETTER ======== #        
 
@@ -334,12 +340,15 @@ def outOfMapLimit(posx, posy):
 def getPlayerCurrentPos():
     curr_x = player.xcor()
     curr_y = player.ycor()
-    # print("[DEBUG] : Player Current Pos -> ", player.pos())
+    # print("[DEBUG] : Plwayer Current Pos -> ", player.pos())
     return curr_x, curr_y
 
 def moveUp(reverseCheck = True):
     x,y = getPlayerCurrentPos()
     
+    # print(isPaused)
+    
+    if isPaused : return 1
     if reversedMove == 1 and reverseCheck == True: return moveDown(False)
     
     if longDash == 1:
@@ -355,6 +364,7 @@ def moveUp(reverseCheck = True):
 def moveDown(reverseCheck = True):
     x,y = getPlayerCurrentPos()
     
+    if isPaused : return 1
     if reversedMove == 1 and reverseCheck == True: return moveUp(False)
     
     if longDash == 1:
@@ -370,6 +380,7 @@ def moveDown(reverseCheck = True):
 def moveLeft(reverseCheck = True):
     x,y = getPlayerCurrentPos()
     
+    if isPaused : return 1
     if reversedMove == 1 and reverseCheck == True : return moveRight(False)
     
     if longDash == 1:
@@ -385,6 +396,7 @@ def moveLeft(reverseCheck = True):
 def moveRight(reverseCheck = True):
     x,y = getPlayerCurrentPos()
     
+    if isPaused : return 1
     if reversedMove == 1 and reverseCheck == True: return moveLeft(False)
     
     if longDash == 1:
@@ -743,17 +755,26 @@ def PUTimer():
             power.write(textPower, align = "center", font = ("Arial", 24, "normal"))
     
 def pauseScreen():
+    if isPaused : return 1
+    setPaused(True)
     pause = turtle.Turtle()
     pause.speed(0)
     pause.color("white")
     pause.penup()
     pause.hideturtle()
     pause.goto(0,0)
-    list = ["Pause 5 seconds","Pause 4 seconds","Pause 3 seconds","Pause 2 seconds","Pause 1 seconds"]
-    for i in list:
-        pause.write(i, align = "center", font = ("Arial", 40, "normal"))
+    
+    countDown = 5
+    
+    for i in range(5, 0, -1):
+        string = "Paused in " +  str(countDown) + " seconds"
+        countDown -= 1
+        pause.write(string, align = "center", font = ("Arial", 40, "normal"))
         time.sleep(1)
         pause.clear()
+        
+    # print("masuk")
+    setPaused(False)
 
 # ========= FUNCTIONS ========= #
 
