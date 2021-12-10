@@ -528,7 +528,7 @@ def moveEnemy():
 
         minimum = min(distances, key = distances.get)
         minimum = checkEnemyMove(en.direction, minimum, x, y)
-        
+
         if minimum == "Up": 
             y += en.speed
             en.direction = "Up"
