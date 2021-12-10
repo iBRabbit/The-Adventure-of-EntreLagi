@@ -11,7 +11,7 @@ DELAY = 0.001 # Delay Kedip Layar
 MAP_SIZE_X = 600
 MAP_SIZE_Y = 600
 DEFAULT_MAX_OBS = 50
-DEFAULT_MAX_ENEMIES = 5
+DEFAULT_MAX_ENEMIES = 1
 DEFAULT_MAX_FOODS = 3
 DEFAULT_MAX_POWERUPS = 4
 INVALID_CONSTANT = -99999
@@ -425,38 +425,45 @@ def checkEnemyMove(enemy_direc, direction, posx, posy): #knowledgeBase
         elif obstaclesCheck(posx+1, posy) and obstaclesCheck(posx-1, posy): return "Down"
         elif distance(player.xcor(), player.ycor(), posx+1, posy) <= distance(player.xcor(), player.ycor(), posx-1, posy):
             if enemy_direc != "Left" and not obstaclesCheck(posx+1, posy): return "Right"
-            else: return "Left"
+            elif enemy_direc != "Right" and not obstaclesCheck(posx-1, posy): return "Left"
+            else: return "Down"
         else:
             if enemy_direc != "Right" and not obstaclesCheck(posx-1, posy): return "Left"
-            else: return "Right"
-
+            elif enemy_direc != "Left" and not obstaclesCheck(posx+1, posy): return "Right"
+            else: return "Down"
     elif direction == "Down":
         if enemy_direc != "Up" and not obstaclesCheck(posx, posy-1) : return direction
         elif obstaclesCheck(posx+1, posy) and obstaclesCheck(posx-1, posy): return "Up"
         elif distance(player.xcor(), player.ycor(), posx+1, posy) <= distance(player.xcor(), player.ycor(), posx-1, posy):
             if enemy_direc != "Left" and not obstaclesCheck(posx+1, posy): return "Right"
-            else: return "Left"
+            elif enemy_direc != "Right" and not obstaclesCheck(posx-1, posy): return "Left"
+            else: return "Up"
         else:
             if enemy_direc != "Right" and not obstaclesCheck(posx-1, posy): return "Left"
-            else: return "Right"
+            elif enemy_direc != "Left" and not obstaclesCheck(posx+1, posy): return "Right"
+            else: return "Up"
     elif direction == "Left":
         if enemy_direc != "Right" and not obstaclesCheck(posx-1, posy): return direction
         elif obstaclesCheck(posx, posy+1) and obstaclesCheck(posx, posy-1): return "Right"
         elif distance(player.xcor(), player.ycor(), posx, posy+1) <= distance(player.xcor(), player.ycor(), posx, posy-1):
             if enemy_direc != "Down" and not obstaclesCheck(posx, posy+1): return "Up"
-            else: return "Down"
+            elif enemy_direc != "Up" and not obstaclesCheck(posx, posy-1): return "Down"
+            else: return "Right"
         else:
             if enemy_direc != "Up" and not obstaclesCheck(posx, posy-1): return "Down"
-            else: return "Up"
+            elif enemy_direc != "Down" and not obstaclesCheck(posx, posy+1): return "Up"
+            else: return "Right"
     elif direction == "Right":
         if enemy_direc != "Left" and not obstaclesCheck(posx+1, posy): return direction
         elif obstaclesCheck(posx, posy+1) and obstaclesCheck(posx, posy-1): return "Left"
         elif distance(player.xcor(), player.ycor(), posx, posy+1) <= distance(player.xcor(), player.ycor(), posx, posy-1):
             if enemy_direc != "Down" and not obstaclesCheck(posx, posy+1): return "Up"
-            else: return "Down"
+            elif enemy_direc != "Up" and not obstaclesCheck(posx, posy-20): return "Down"
+            else: return "Left"
         else:
             if enemy_direc != "Up" and not obstaclesCheck(posx, posy-20): return "Down"
-            else: return "Up"
+            elif enemy_direc != "Down" and not obstaclesCheck(posx, posy+1): return "Up"
+            else: return "Left"
 
 def moveEnemy():
     for en in enemies:
@@ -521,7 +528,7 @@ def moveEnemy():
 
         minimum = min(distances, key = distances.get)
         minimum = checkEnemyMove(en.direction, minimum, x, y)
-
+        
         if minimum == "Up": 
             y += en.speed
             en.direction = "Up"
