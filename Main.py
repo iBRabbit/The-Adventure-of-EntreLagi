@@ -54,28 +54,8 @@ goal.penup()
 goal.goto(280, 0)
 
 title = turtle.Turtle()
-title.speed(0)
-title.color("gold")
-title.penup()
-title.hideturtle()
-title.goto(0, 350)
-title.write("The Advanture of Entre Lagi", align = "center", font = ("Arial", 30, "normal"))
-
 levelText = turtle.Turtle()
-levelText.speed(0)
-levelText.color("white")
-levelText.penup()
-levelText.hideturtle()
-levelText.goto(-240, 310)
-levelText.write("Level : 1", align = "center", font = ("Arial", 24, "normal"))
-
 scoreText = turtle.Turtle()
-scoreText.speed(0)
-scoreText.color("white")
-scoreText.penup()
-scoreText.hideturtle()
-scoreText.goto(110,310)
-scoreText.write("Score : 0 High Score : 0", align = "center", font = ("Arial", 24, "normal"))
 
 gameOverText = turtle.Turtle()
 gameOverText.speed(0)
@@ -166,7 +146,29 @@ def setPaused(params):
 # ========= SETTER ======== #        
 
 # ========= FUNCTIONS ========= #
- 
+
+def createText():
+    title.speed(0)
+    title.color("gold")
+    title.penup()
+    title.hideturtle()
+    title.goto(0, 350)
+    title.write("The Advanture of Entre Lagi", align = "center", font = ("Arial", 30, "normal"))
+
+    levelText.speed(0)
+    levelText.color("white")
+    levelText.penup()
+    levelText.hideturtle()
+    levelText.goto(-240, 310)
+    levelText.write("Level : 1", align = "center", font = ("Arial", 24, "normal"))
+
+    scoreText.speed(0)
+    scoreText.color("white")
+    scoreText.penup()
+    scoreText.hideturtle()
+    scoreText.goto(110,310)
+    scoreText.write("Score : 0 High Score : 0", align = "center", font = ("Arial", 24, "normal"))
+
 def createLine(line, x):
     if x == 0:
         line.begin_fill()
@@ -218,6 +220,15 @@ def border():
 
 def distance(x1,y1,x2,y2): # Akhirnya pelajaran kalkulus selama ini kepake
     return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+def initPlayer2():
+    player2 = turtle.Turtle()
+    player2.speed(3)
+    player2.shape("square")
+    player2.color("green")
+    player2.penup()
+    player2.goto(-280, 0)
+    player2.direction = "stop"
 
 def initObstacles():
     for i in range(obsQty):
@@ -291,7 +302,7 @@ def initFoods():
         food.speed = 0
         food.penup()
         food.goto(posx, posy)
-        food.shape("energy1.gif")
+        food.shape("energy.gif")
         foods.append(food)
 
 def initPowerUps():
@@ -698,6 +709,10 @@ def timeThroughTheWall():
 
 
 def gameOver():
+    winsound.PlaySound("mixkit-player-losing-or-failing-2042.wav", winsound.SND_ASYNC)
+    gameOverText.write("GAME OVER", align = "center", font = ("Arial", 24, "normal"))
+    time.sleep(3)
+    gameOverText.clear()
     setLevel(1)
     setScore(0)
     updatelevelText()
@@ -712,17 +727,13 @@ def gameOver():
     initFoods()
     clearPowerUps()
     initPowerUps()
-    winsound.PlaySound("mixkit-player-losing-or-failing-2042.wav", winsound.SND_ASYNC)
-    gameOverText.write("GAME OVER", align = "center", font = ("Arial", 24, "normal"))
-    time.sleep(3)
-    gameOverText.clear()
     
 
 def registerShape():
     turtle.register_shape("powerUp.gif")
     turtle.register_shape("wall.gif")
     turtle.register_shape("enemy.gif")
-    turtle.register_shape("energy1.gif")
+    turtle.register_shape("energy.gif")
 
 def readHighScore():
     file = open("highscore.txt", "rt")
@@ -786,7 +797,8 @@ def pauseScreen():
 # ========= FUNCTIONS ========= #
 
 if __name__ == "__main__":
-    
+    if window.numinput("Player", "Number of first player:") == 2 : initPlayer2() 
+    createText()
     registerShape()
     readHighScore()
     updateScoreText()
@@ -800,9 +812,12 @@ if __name__ == "__main__":
     window.onkey(moveDown, "s")
     window.onkey(moveLeft, "a")
     window.onkey(moveRight, "d")
+    window.onkey(moveUp, "Up")
+    window.onkey(moveDown, "Down")
+    window.onkey(moveLeft, "Left")
+    window.onkey(moveRight, "Right")
     window.onkey(pauseScreen, "space")
     
-
     while True:
         
         window.update()
