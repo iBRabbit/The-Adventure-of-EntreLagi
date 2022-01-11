@@ -59,7 +59,7 @@ title.color("gold")
 title.penup()
 title.hideturtle()
 title.goto(0, 350)
-title.write("The Advanture of Entre Lagi", align = "center", font = ("Arial", 30, "normal"))
+title.write("The Adventure of Entre Lagi", align = "center", font = ("Arial", 30, "normal"))
 
 levelText = turtle.Turtle()
 levelText.speed(0)
@@ -819,7 +819,7 @@ if __name__ == "__main__":
             setPUType(temp) 
             getPowerUp(temp)
             temp = -1
-            
+
         PUTimer()
         time.sleep(DELAY)
 
