@@ -16,6 +16,8 @@ DEFAULT_MAX_FOODS = 3
 DEFAULT_MAX_POWERUPS = 4
 INVALID_CONSTANT = -99999
 
+numPlayer = 1
+alivePlayer = 2
 level = 1
 score = 0
 obsQty = DEFAULT_MAX_OBS
@@ -45,6 +47,7 @@ player.color("aqua")
 player.penup()
 player.goto(-280, 0)
 player.direction = "stop"
+player2 = turtle.Turtle()
 
 goal = turtle.Turtle()
 goal.speed()
@@ -133,7 +136,6 @@ def setHighScore(toScore):
     highScore = toScore
     saveHighScore()
 
-
 def setPUType(typeP):
     global PUType
     PUType = typeP
@@ -142,6 +144,9 @@ def setPaused(params):
     global isPaused
     isPaused = params
     
+def setAlivePlayer(alive):
+    global alivePlayer
+    alivePlayer = alive
     
 # ========= SETTER ======== #        
 
@@ -222,10 +227,10 @@ def distance(x1,y1,x2,y2): # Akhirnya pelajaran kalkulus selama ini kepake
     return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
 def initPlayer2():
-    player2 = turtle.Turtle()
+    player2.showturtle()
     player2.speed(3)
-    player2.shape("square")
-    player2.color("green")
+    player2.shape("circle")
+    player2.color("aqua")
     player2.penup()
     player2.goto(-280, 0)
     player2.direction = "stop"
@@ -335,90 +340,123 @@ def initPowerUps():
                     check = False
                     break
             if posx == -280 and posy == 0 or posx == 280 and posy == 0: check = False
-        power = turtle.Turtle()
-        power.speed = 0
-        power.penup()
-        power.goto(posx, posy)
-        power.shape("powerUp.gif")
-        power.shapesize(10,10,70)
-        powerUps.append(power)
+        powers = turtle.Turtle()
+        powers.speed = 0
+        powers.penup()
+        powers.goto(posx, posy)
+        powers.shape("powerUp.gif")
+        powers.shapesize(10,10,70)
+        powerUps.append(powers)
 
 def outOfMapLimit(posx, posy):
     if posx >= 300 or posx <= -300 or posy >= 300 or posy <= -300:
         return True
     return False
     
-def getPlayerCurrentPos():
-    curr_x = player.xcor()
-    curr_y = player.ycor()
-    # print("[DEBUG] : Plwayer Current Pos -> ", player.pos())
+def getPlayerCurrentPos(nPlayer):
+    if nPlayer == 1:
+        curr_x = player.xcor()
+        curr_y = player.ycor()
+    else:
+        curr_x = player2.xcor()
+        curr_y = player2.ycor()
     return curr_x, curr_y
 
-def moveUp(reverseCheck = True):
-    x,y = getPlayerCurrentPos()
-    
-    # print(isPaused)
+def moveUp(reverseCheck, nPlayer):
+    x,y = getPlayerCurrentPos(nPlayer)
     
     if isPaused : return 1
-    if reversedMove == 1 and reverseCheck == True: return moveDown(False)
-    
+    if reversedMove == 1 and reverseCheck == True: return moveDown(False, nPlayer)
+
     if longDash == 1:
         if obstaclesCheck(x, y + 40): return False
         if outOfMapLimit(x, y+40): return False
-        player.sety(y + 40)
+        if nPlayer == 2 : player2.sety(y + 40)
+        else : player.sety(y + 40)
     else:
         if throughTheWall == 0 and obstaclesCheck(x, y + 20): return False
         if outOfMapLimit(x, y+20): return False
-        player.sety(y + 20)
+        if nPlayer == 2 : player2.sety(y + 20)
+        else : player.sety(y + 20)
     setPlayerDirection("Up")
 
-def moveDown(reverseCheck = True):
-    x,y = getPlayerCurrentPos()
+def moveDown(reverseCheck, nPlayer):
+    x,y = getPlayerCurrentPos(nPlayer)
     
     if isPaused : return 1
-    if reversedMove == 1 and reverseCheck == True: return moveUp(False)
+    if reversedMove == 1 and reverseCheck == True: return moveUp(False, nPlayer)
     
     if longDash == 1:
         if obstaclesCheck(x, y - 40): return False
         if outOfMapLimit(x, y-40): return False
-        player.sety(y - 40)
+        if nPlayer == 2 : player2.sety(y - 40)
+        else : player.sety(y - 40)
     else:
         if throughTheWall == 0 and obstaclesCheck(x, y - 20) : return False
         if outOfMapLimit(x, y-20): return False
-        player.sety(y - 20)
+        if nPlayer == 2 : player2.sety(y - 20)
+        else : player.sety(y - 20)
     setPlayerDirection("Down")
 
-def moveLeft(reverseCheck = True):
-    x,y = getPlayerCurrentPos()
+def moveLeft(reverseCheck, nPlayer):
+    x,y = getPlayerCurrentPos(nPlayer)
     
     if isPaused : return 1
-    if reversedMove == 1 and reverseCheck == True : return moveRight(False)
+    if reversedMove == 1 and reverseCheck == True : return moveRight(False, nPlayer)
     
     if longDash == 1:
         if obstaclesCheck(x - 40, y): return False
         if outOfMapLimit(x-40, y): return False
-        player.setx(x - 40)
+        if nPlayer == 2 : player2.setx(x - 40)
+        else : player.setx(x - 40)
     else:
         if throughTheWall == 0 and obstaclesCheck(x - 20, y) : return False
         if outOfMapLimit(x-20, y): return False
-        player.setx(x - 20)
+        if nPlayer == 2 : player2.setx(x - 20)
+        else : player.setx(x - 20)
     setPlayerDirection("Left")
 
-def moveRight(reverseCheck = True):
-    x,y = getPlayerCurrentPos()
+def moveRight(reverseCheck, nPlayer):
+    x,y = getPlayerCurrentPos(nPlayer)
     
     if isPaused : return 1
-    if reversedMove == 1 and reverseCheck == True: return moveLeft(False)
+    if reversedMove == 1 and reverseCheck == True: return moveLeft(False, nPlayer)
     
     if longDash == 1:
         if obstaclesCheck(x + 40, y): return False
         if outOfMapLimit(x+40, y): return False
-        player.setx(x + 40)
+        if nPlayer == 2 : player2.setx(x + 40)
+        else : player.setx(x + 40)
     else:
         if throughTheWall == 0 and obstaclesCheck(x + 20, y) : return False
         if outOfMapLimit(x+20, y): return False
-        player.setx(x + 20)
+        if nPlayer == 2 : player2.setx(x + 20)
+        else : player.setx(x + 20)
     setPlayerDirection("Right")
+
+def mUp():
+    moveUp(True, 1)
+
+def mDown():
+    moveDown(True, 1)
+
+def mLeft():
+    moveLeft(True, 1)
+
+def mRight():
+    moveRight(True, 1)
+
+def mUp2():
+    moveUp(True, 2)
+
+def mDown2():
+    moveDown(True, 2)
+
+def mLeft2():
+    moveLeft(True, 2)
+
+def mRight2():
+    moveRight(True, 2)
 
 def isInRangeOfPoint(a,b,x,y,radius):
     if a >= x-radius and a <= x+radius and b >= y-radius and b <= y+radius:
@@ -481,7 +519,7 @@ def moveEnemy():
         y = en.ycor()
         x = en.xcor()
         
-        if distance(player.xcor(), player.ycor(), en.xcor(), en.ycor()) > 200:
+        if distance(player.xcor(), player.ycor(), en.xcor(), en.ycor()) > 200 and distance(player2.xcor(), player2.ycor(), en.xcor(), en.ycor()) > 200:
             if en.direction == "Up" :
                 if obstaclesCheck(x, y+20):
                     y -= en.speed
@@ -529,13 +567,20 @@ def moveEnemy():
             en.sety(y)
             en.setx(x)
             continue
-        
-        distances = {
-            "Up" : distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()),
-            "Down" : distance(en.xcor(), en.ycor() - 20, player.xcor(), player.ycor()),
-            "Left" : distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()),
-            "Right" : distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor())
-        }
+        if numPlayer == 1:
+            distances = {
+                "Up" : distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()),
+                "Down" : distance(en.xcor(), en.ycor() - 20, player.xcor(), player.ycor()),
+                "Left" : distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()),
+                "Right" : distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor())
+            }
+        else:
+            distances = {
+                "Up" : min(distance(en.xcor(), en.ycor() + 20, player.xcor(), player.ycor()), distance(en.xcor(), en.ycor() + 20, player2.xcor(), player2.ycor())),
+                "Down" : min(distance(en.xcor(), en.ycor() - 20, player.xcor(), player.ycor()), distance(en.xcor(), en.ycor() - 20, player2.xcor(), player2.ycor())),
+                "Left" : min(distance(en.xcor() - 20, en.ycor(), player.xcor(), player.ycor()), distance(en.xcor() - 20, en.ycor(), player2.xcor(), player2.ycor())),
+                "Right" : min(distance(en.xcor() + 20, en.ycor(), player.xcor(), player.ycor()), distance(en.xcor() + 20, en.ycor(), player2.xcor(), player2.ycor()))
+            }
 
         minimum = min(distances, key = distances.get)
         minimum = checkEnemyMove(en.direction, minimum, x, y)
@@ -579,18 +624,37 @@ def setPlayerToSpawn():
     player.setx(-280)
     player.sety(0)
     player.direction = "stop"
+    if numPlayer == 2:
+        player2.setx(-280)
+        player2.sety(0)
+        player2.direction = "stop"
 
 def isGoalAchieved():
-    if player.distance(goal) < 20.0 and foodsQty <= 0: return True
-    else : return False
+    if numPlayer == 1 :
+        if player.distance(goal) < 20.0 and foodsQty <= 0 : return True
+        else : return False
+    else :
+        if player.distance(goal) < 20.0 and player2.distance(goal) < 20.0 and foodsQty <= 0 : return True 
+        elif alivePlayer == 1 and foodsQty <= 0 : 
+            if player.distance(goal) < 20.0 : return True
+            if player2.distance(goal) < 20.0 : return True
+        else:
+            if player.distance(goal) < 20.0 and foodsQty <= 0 :
+                player.goto(-INVALID_CONSTANT,INVALID_CONSTANT)
+                setAlivePlayer(alivePlayer-1)
+            if player2.distance(goal) < 20.0 and foodsQty <= 0 :
+                player2.goto(-INVALID_CONSTANT,INVALID_CONSTANT)
+                setAlivePlayer(alivePlayer-1)
+            return False
 
-def clearPowerUps():        
+def clearPowerUps():
     setPUTime(0)
     setLongDash(0)
     setInvincible(0)
     setReverse(0)
     setThroughTheWall(0)
     player.color("aqua")
+    player2.color("aqua")
 
 def goToNextLevel():
     clearAll()
@@ -599,20 +663,27 @@ def goToNextLevel():
     setLevel(level + 1)
     updatelevelText()
     
-    setObstaclesQty(obsQty + 2)
+    if numPlayer == 1 : setObstaclesQty(obsQty + 40)
+    else : setObstaclesQty(obsQty + 30)
     initObstacles()
 
     winsound.PlaySound("mixkit-arcade-game-complete-or-approved-mission-205.wav", winsound.SND_ASYNC)
 
-    if level % 4 == 0 : setEnemiesQty(enemiesQty + 1)
+    if level % 4 == 0 and numPlayer == 1 : setEnemiesQty(enemiesQty + 1)
+    else : setEnemiesQty(enemiesQty + 2)
     initEnemies()
 
-    setFoodQty(foodsMaxQty + 1)
-    setFoodMaxQty(foodsMaxQty + 1)
+    if numPlayer == 1 : 
+        setFoodQty(foodsMaxQty + 1)
+        setFoodMaxQty(foodsMaxQty + 1)
+    else : 
+        setFoodQty(foodsMaxQty + 2)
+        setFoodMaxQty(foodsMaxQty + 2)
     initFoods()
     
     clearPowerUps()
     initPowerUps()
+    if numPlayer == 2 : setAlivePlayer(2)
 
 def updatelevelText():
     levelText.clear()
@@ -625,25 +696,32 @@ def updateScoreText():
     scoreText.write(string, align = "center", font = ("Arial", 24, "normal"))
 
 def isCollideWithEnemy():
-    for en in enemies:
-        if isInRangeOfPoint(en.xcor(), en.ycor(), player.xcor(), player.ycor(), 10.0) : return True
-    return False
+    if invincible == 1 : return False
+    if numPlayer == 1 :
+        for en in enemies:
+            if isInRangeOfPoint(en.xcor(), en.ycor(), player.xcor(), player.ycor(), 10.0) : return True
+        return False
+    else :
+        flag = 0
+        for en in enemies:
+            if isInRangeOfPoint(en.xcor(), en.ycor(), player.xcor(), player.ycor(), 10.0) : 
+                flag += 1
+                player.goto(-INVALID_CONSTANT,-INVALID_CONSTANT)
+            if isInRangeOfPoint(en.xcor(), en.ycor(), player2.xcor(), player2.ycor(), 10.0) : 
+                flag += 1
+                player2.goto(-INVALID_CONSTANT,-INVALID_CONSTANT)
+        if flag != 0 : 
+            setAlivePlayer(alivePlayer-flag)
+            if alivePlayer == 0 : return True
+            else : return False
+        return False
 
 def isCollideWithFood():
     flag = False
     for i in range(foodsQty):
-        if longDash == 1:
-            x = player.xcor()
-            y = player.ycor()
-
-            if player.direction == "Up": y-=20 
-            elif player.direction == "Down": y+=20
-            elif player.direction == "Left": x+=20
-            elif player.direction == "Right": x-=20
-
-            if isInRangeOfPoint(foods[i].xcor(), foods[i].ycor(), x, y, 10.0): flag = True
-
         if isInRangeOfPoint(foods[i].xcor(), foods[i].ycor(), player.xcor(), player.ycor(), 10.0): flag = True
+        if numPlayer == 2 and isInRangeOfPoint(foods[i].xcor(), foods[i].ycor(), player2.xcor(), player2.ycor(), 10.0): flag = True
+        
         if flag == True:
             foods[i].goto(INVALID_CONSTANT,INVALID_CONSTANT)
             foods.pop(i)
@@ -652,11 +730,18 @@ def isCollideWithFood():
     return False        
 
 def isCollideWithPowerUp():
-    for i in range(powerUpsQty):
-        if isInRangeOfPoint(powerUps[i].xcor(), powerUps[i].ycor(), player.xcor(), player.ycor(), 10.0):
-            powerUps[i].goto(INVALID_CONSTANT,INVALID_CONSTANT)
-            return i
-    return -1
+    if numPlayer == 1 : 
+        for i in range(powerUpsQty):
+            if isInRangeOfPoint(powerUps[i].xcor(), powerUps[i].ycor(), player.xcor(), player.ycor(), 10.0):
+                powerUps[i].goto(INVALID_CONSTANT,INVALID_CONSTANT)
+                return i
+        return -1
+    else :
+        for i in range(powerUpsQty):
+            if isInRangeOfPoint(powerUps[i].xcor(), powerUps[i].ycor(), player.xcor(), player.ycor(), 10.0) or isInRangeOfPoint(powerUps[i].xcor(), powerUps[i].ycor(), player2.xcor(), player2.ycor(), 10.0):
+                powerUps[i].goto(INVALID_CONSTANT,INVALID_CONSTANT)
+                return i
+        return -1
 
 def getPowerUp(PUType):
     clearPowerUps()
@@ -664,51 +749,39 @@ def getPowerUp(PUType):
         setLongDash(1)
         setPUTime(500)
         player.color("purple")
+        if numPlayer == 2 : player2.color("purple")
     elif PUType == 1:
         setInvincible(1)
         setPUTime(500)
         player.color("grey")
+        if numPlayer == 2 : player2.color("grey")
     elif PUType == 2:
         setThroughTheWall(1)
         setPUTime(500)
         player.color("white")
+        if numPlayer == 2 : player2.color("white")
     elif PUType == 3:
         setReverse(1)
         setPUTime(500)
         player.color("red")
+        if numPlayer == 2 : player2.color("red")
+    elif PUType == 4:
+        if alivePlayer == 1 and player.xcor() == -INVALID_CONSTANT and player.ycor() == -INVALID_CONSTANT : player.goto(-280,0)
+        if alivePlayer == 1 and player2.xcor() == -INVALID_CONSTANT and player2.ycor() == -INVALID_CONSTANT : player2.goto(-280,0)
+        setAlivePlayer(2)
+        setPUTime(100)
+        power.clear()
+        textPower = "Back To Life"
+        power.write(textPower, align = "center", font = ("Arial", 24, "normal"))
+        winsound.PlaySound("mixkit-player-boost-recharging-2040.wav", winsound.SND_ASYNC)
+        return 1
     power.clear()
     textPower = typePower[PUType] + "in 5.0 seconds"
     power.write(textPower, align = "center", font = ("Arial", 24, "normal"))
     winsound.PlaySound("mixkit-player-boost-recharging-2040.wav", winsound.SND_ASYNC)
-    
-def timeReverse():
-    if PUTime <= 0 :
-        setReverse(0)
-        setPUTime(0)
-        player.color("aqua")
-        
-def timeLongDash():
-    if(PUTime<= 0): 
-        setLongDash(0)
-        setPUTime(0)
-        player.color("aqua")
-
-
-def timeInvincible():
-    if(PUTime<= 0): 
-        setInvincible(0)
-        setPUTime(0)
-        player.color("aqua")
-
-
-def timeThroughTheWall():
-    if(PUTime<= 0): 
-        setThroughTheWall(0)
-        setPUTime(0)
-        player.color("aqua")
-
 
 def gameOver():
+    power.clear()
     winsound.PlaySound("mixkit-player-losing-or-failing-2042.wav", winsound.SND_ASYNC)
     gameOverText.write("GAME OVER", align = "center", font = ("Arial", 24, "normal"))
     time.sleep(3)
@@ -727,7 +800,7 @@ def gameOver():
     initFoods()
     clearPowerUps()
     initPowerUps()
-    
+    if numPlayer == 2 : setAlivePlayer(2)
 
 def registerShape():
     turtle.register_shape("powerUp.gif")
@@ -760,6 +833,7 @@ def deactivePU():
     setReverse(0)
     setPUTime(0)
     player.color("aqua")
+    if numPlayer == 2 : player2.color("aqua")
 
 def PUTimer():
     if PUTime > 0:
@@ -779,7 +853,6 @@ def pauseScreen():
     pause.speed(0)
     pause.color("white")
     pause.penup()
-    pause.hideturtle()
     pause.goto(0,0)
     
     countDown = 5
@@ -797,7 +870,12 @@ def pauseScreen():
 # ========= FUNCTIONS ========= #
 
 if __name__ == "__main__":
-    if window.numinput("Player", "Number of first player:") == 2 : initPlayer2() 
+    numPlayer = window.numinput("Player", "Number of player [1|2] :") 
+    if numPlayer != 1 and numPlayer != 2 : window.bye()
+    elif numPlayer == 1 : player2.hideturtle()
+    elif numPlayer == 2 : 
+        initPlayer2()
+        setPowerUpQty(5)
     createText()
     registerShape()
     readHighScore()
@@ -808,14 +886,15 @@ if __name__ == "__main__":
     initFoods()
     initPowerUps()
     window.listen()
-    window.onkey(moveUp, "w")
-    window.onkey(moveDown, "s")
-    window.onkey(moveLeft, "a")
-    window.onkey(moveRight, "d")
-    window.onkey(moveUp, "Up")
-    window.onkey(moveDown, "Down")
-    window.onkey(moveLeft, "Left")
-    window.onkey(moveRight, "Right")
+    window.onkey(mUp, "w")
+    window.onkey(mDown, "s")
+    window.onkey(mLeft, "a")
+    window.onkey(mRight, "d")
+    if numPlayer == 2:
+        window.onkey(mUp2, "Up")
+        window.onkey(mDown2, "Down")
+        window.onkey(mLeft2, "Left")
+        window.onkey(mRight2, "Right")
     window.onkey(pauseScreen, "space")
     
     while True:
@@ -823,18 +902,17 @@ if __name__ == "__main__":
         window.update()
         moveEnemy()
         if isGoalAchieved() : goToNextLevel()
-        if isCollideWithEnemy() and invincible == 0: gameOver()
-        if isCollideWithFood():
+        if isCollideWithEnemy() : gameOver()
+        if isCollideWithFood() :
             setScore(score + 10)
             if score >= highScore : setHighScore(int(score))
             updateScoreText()
         
         temp = isCollideWithPowerUp()   
         if temp >= 0 : 
-            setPUType(temp) 
+            setPUType(temp)
             getPowerUp(temp)
             temp = -1
-            
         PUTimer()
         time.sleep(DELAY)
 
