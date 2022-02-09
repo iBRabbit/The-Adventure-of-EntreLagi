@@ -1,0 +1,10 @@
+{
+    "python.pythonPath": "D:\\Programs\\Anaconda\\python.exe",
+    "files.associations": {
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "*.tcc": "cpp",
+        "cstdlib": "cpp",
+        "algorithm": "cpp"
+    }
+}
